@@ -39,27 +39,9 @@
       background-color: #fcf8f2;
       color: #2b2b2b;
     }
-    
     .card-shadow {
       box-shadow: 0 10px 30px rgba(199, 42, 42, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
     }
-
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #e0b0b0;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #c92a2a;
-    }
-
     .view-section {
       display: none;
       opacity: 0;
@@ -69,14 +51,12 @@
       display: block;
       opacity: 1;
     }
-
     .tab-content {
       display: none;
     }
     .tab-content.active {
       display: block;
     }
-
     .option-card {
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -92,10 +72,6 @@
     .option-card.selected .option-badge {
       background-color: #ffffff;
       color: #c92a2a;
-    }
-
-    .result-tab-btn {
-      transition: all 0.2s ease;
     }
     .result-tab-btn.active {
       background-color: #c92a2a;
@@ -115,7 +91,6 @@
           <i class="fa-solid fa-book-open text-brand-600 text-2xl"></i>
         </div>
         
-        <!-- 連線狀態標籤 -->
         <div class="flex items-center justify-center gap-2 mb-2">
           <span class="bg-red-50 text-brand-600 text-xs font-bold px-3 py-1 rounded-full border border-red-200">
             <i class="fa-regular fa-calendar-check mr-1"></i>系統狀態：<span id="system-status">初始化中...</span>
@@ -127,13 +102,13 @@
       </div>
 
       <div class="space-y-4 max-w-md mx-auto">
-        <!-- 選擇測驗單元 -->
+        <!-- 選擇測驗單元 (由 GAS 動態產生) -->
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1">
             <i class="fa-solid fa-layer-group text-brand-600 mr-1"></i>測驗單元
           </label>
           <select id="select-quiz" onchange="onQuizUnitChange()" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm font-medium transition">
-            <option value="">載入測驗單元中...</option>
+            <option value="">正在從雲端載入測驗單元...</option>
           </select>
         </div>
 
@@ -184,7 +159,7 @@
             </div>
             <div>
               <label class="block text-[11px] font-bold text-gray-500 mb-1">班級名稱</label>
-              <input type="text" id="input-manual-class" placeholder="例: 服二和" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand-600">
+              <input type="text" id="input-manual-class" placeholder="例: 服三和" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand-600">
             </div>
             <div>
               <label class="block text-[11px] font-bold text-gray-500 mb-1">真實姓名</label>
@@ -247,9 +222,7 @@
               題目載入中...
             </h2>
 
-            <div id="options-list" class="space-y-3">
-              <!-- 選項區域 -->
-            </div>
+            <div id="options-list" class="space-y-3"></div>
           </div>
 
           <div class="pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
@@ -326,14 +299,12 @@
             <i class="fa-solid fa-crown text-yellow-500"></i>
             <span>本次測驗成就</span>
           </div>
-          <div id="leaderboard-container" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
-          </div>
+          <div id="leaderboard-container" class="space-y-2 max-h-[300px] overflow-y-auto pr-1"></div>
         </div>
       </div>
 
       <div id="tab-content-4" class="tab-content">
-        <div id="detailed-breakdown-container" class="space-y-4 max-h-[420px] overflow-y-auto pr-1">
-        </div>
+        <div id="detailed-breakdown-container" class="space-y-4 max-h-[420px] overflow-y-auto pr-1"></div>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
@@ -360,12 +331,7 @@
         </button>
       </div>
 
-      <div id="history-list-container" class="space-y-3 max-h-[380px] overflow-y-auto pr-1">
-        <div class="text-center py-8 text-gray-400 text-sm">
-          <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-brand-600 block"></i>
-          正在載入歷史紀錄...
-        </div>
-      </div>
+      <div id="history-list-container" class="space-y-3 max-h-[380px] overflow-y-auto pr-1"></div>
 
       <button onclick="showView('view-login')" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition text-sm mt-6">
         返回選單
@@ -438,7 +404,8 @@
   </div>
 
   <script>
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycby7ZFDW3iOcW7dWcdQ9R3718GrmkNQUirPuBZlwditTEyd2jRRZJFQVf97zmGUmDQP8/exec";
+    // 最新部署的 GAS Web App API URL
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzDmRXpcW_RIZjDCBsZ-9S6EUoBImxDLHDRqbtCuJFBLloaf6Bq8dp8rQcDtqrFVsKA/exec";
 
     let allUsersData = [];
     let currentQuizData = [];
@@ -465,47 +432,30 @@
           statusTag.innerText = "雲端線上資料庫已連線";
 
           allUsersData = result.students || [];
+          availableUnits = (result.units && result.units.length > 0) ? result.units : ["B4L1鴻門宴", "B4L2黃同學"];
           
-          // 解析題庫與可選單元清單
+          renderUnitOptions(result.currentQuizId);
+          
           if (result.questions && result.questions.length > 0) {
             currentQuizData = result.questions;
           }
-          
-          if (result.units && result.units.length > 0) {
-            availableUnits = result.units;
-          } else {
-            // 自動從題目中抓取單元名稱
-            availableUnits = ["B4L1鴻門宴", "B4L2黃同學"];
-          }
 
-          renderUnitOptions();
           initClassOptions();
         } else {
-          statusTag.innerText = "連線異常，切換至演示模式";
-          fallbackMockData();
+          statusTag.innerText = "連線異常";
         }
       } catch (e) {
-        console.warn("GAS 遠端連線問題，切換至演示模式：", e);
-        statusTag.innerText = "演示模式";
-        fallbackMockData();
+        console.warn("GAS 遠端連線問題：", e);
+        statusTag.innerText = "離線模式";
       }
     }
 
-    function fallbackMockData() {
-      availableUnits = ["B4L1鴻門宴", "B4L2黃同學"];
-      renderUnitOptions();
-      allUsersData = [
-        { className: "服二和", seatNumber: "1", name: "張小明", password: "1234" },
-        { className: "服二和", seatNumber: "2", name: "李小華", password: "1234" }
-      ];
-      initClassOptions();
-    }
-
-    function renderUnitOptions() {
+    function renderUnitOptions(selectedId) {
       const quizSelect = document.getElementById('select-quiz');
       quizSelect.innerHTML = '';
       availableUnits.forEach(unit => {
-        quizSelect.innerHTML += `<option value="${unit}">${unit}</option>`;
+        const isSelected = (selectedId && unit === selectedId) ? 'selected' : '';
+        quizSelect.innerHTML += `<option value="${unit}" ${isSelected}>${unit}</option>`;
       });
     }
 
@@ -513,11 +463,11 @@
       const selectedUnit = document.getElementById('select-quiz').value;
       if (!selectedUnit) return;
 
-      showToast(`正在載入【${selectedUnit}】單元題目...`, "fa-spinner fa-spin");
+      showToast(`載入【${selectedUnit}】題目中...`, "fa-spinner fa-spin");
       try {
         const response = await fetch(`${GAS_API_URL}?action=getInitialData&quizId=${encodeURIComponent(selectedUnit)}`);
         const result = await response.json();
-        if (result.status === 'success' && result.questions && result.questions.length > 0) {
+        if (result.status === 'success' && result.questions) {
           currentQuizData = result.questions;
           showToast(`已載入【${selectedUnit}】共 ${currentQuizData.length} 題`, "fa-circle-check");
         }
@@ -635,7 +585,6 @@
 
       currentUser = { className, seatNumber, name, quizId };
 
-      // 若目前單元題目尚未拉取完畢，即刻透過 API 載入
       if (!currentQuizData || currentQuizData.length === 0) {
         showToast("載入試卷中...", "fa-spinner fa-spin");
         try {
@@ -648,7 +597,7 @@
       }
 
       if (!currentQuizData || currentQuizData.length === 0) {
-        showToast("查無該單元題目，請確認試算表設定！", "fa-triangle-exclamation");
+        showToast("該單元尚無題目，請確認試算表！", "fa-triangle-exclamation");
         return;
       }
 
@@ -671,7 +620,6 @@
       const questionWrapper = document.getElementById('question-wrapper');
       const mobileBtn = document.getElementById('btn-mobile-passage');
 
-      // 文章文本防呆處理
       const hasPassage = q.passage && String(q.passage).trim() !== "" && String(q.passage).trim() !== "null" && String(q.passage).trim() !== "undefined";
 
       if (hasPassage) {
