@@ -144,7 +144,7 @@
               <i class="fa-solid fa-graduation-cap text-brand-600 mr-1"></i>選擇班級
             </label>
             <select id="input-class" onchange="onClassChange()" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm font-medium transition">
-              <option value="服二和">服二和</option>
+              <option value="">載入班級中...</option>
             </select>
           </div>
 
@@ -196,7 +196,7 @@
         <!-- 登入提示 -->
         <div id="registered-student-notice" class="bg-blue-50/80 border border-blue-200 rounded-2xl p-3 text-xs text-blue-800 flex items-center gap-2">
           <i class="fa-solid fa-shield-cat text-blue-600 text-lg flex-shrink-0"></i>
-          <span>預設密碼為 <strong>1234</strong>，首次登入建議先點擊右上方「修改密碼」更新個人密碼。</span>
+          <span>預設密碼為 <strong>1234</strong>，首次登入建議點擊右上方「修改密碼」更新個人密碼。</span>
         </div>
 
         <!-- 操作按鈕 -->
@@ -209,6 +209,11 @@
           <i class="fa-solid fa-clock-rotate-left text-gray-500"></i>
           <span>查詢個人歷次測驗紀錄</span>
         </button>
+      </div>
+
+      <!-- 頁尾署名 -->
+      <div class="text-center text-[11px] text-gray-400 mt-8">
+        高雄市立三民家商國文科黃一軒設計
       </div>
     </section>
 
@@ -284,10 +289,10 @@
           <i class="fa-solid fa-chart-pie mr-1"></i>能力雷達
         </button>
         <button id="tab-btn-2" onclick="switchResultTab(2)" class="result-tab-btn py-2.5 rounded-xl text-center text-gray-600 hover:text-brand-600">
-          <i class="fa-solid fa-chart-column mr-1"></i>錯題統計
+          <i class="fa-solid fa-chart-column mr-1"></i>錯題分佈
         </button>
         <button id="tab-btn-3" onclick="switchResultTab(3)" class="result-tab-btn py-2.5 rounded-xl text-center text-gray-600 hover:text-brand-600">
-          <i class="fa-solid fa-trophy mr-1"></i>高分榜
+          <i class="fa-solid fa-trophy mr-1"></i>排行榜
         </button>
         <button id="tab-btn-4" onclick="switchResultTab(4)" class="result-tab-btn py-2.5 rounded-xl text-center text-gray-600 hover:text-brand-600">
           <i class="fa-solid fa-file-circle-check mr-1"></i>錯題詳解
@@ -296,7 +301,7 @@
 
       <div id="tab-content-1" class="tab-content active space-y-4">
         <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 sm:p-6">
-          <div class="text-xs font-bold text-gray-500 mb-2 text-center">國文能力維度掌握度 (%)</div>
+          <div class="text-xs font-bold text-gray-500 mb-2 text-center">國文能力向度掌握度 (%)</div>
           <div class="w-full max-w-xs mx-auto mb-4">
             <canvas id="radarChart"></canvas>
           </div>
@@ -308,11 +313,11 @@
 
       <div id="tab-content-2" class="tab-content space-y-4">
         <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 sm:p-6">
-          <div class="text-xs font-bold text-gray-500 mb-2 text-center">全體填答者「每題錯誤人數」長條圖</div>
+          <div class="text-xs font-bold text-gray-500 mb-2 text-center">個人各題作答正確狀態</div>
           <div class="w-full max-w-md mx-auto mb-2">
             <canvas id="barChart"></canvas>
           </div>
-          <p class="text-xs text-gray-400 text-center">呈現班級各題錯誤率，方便針對高頻錯題進行重點複習。</p>
+          <p class="text-xs text-gray-400 text-center">紅色代表該題答錯，綠色代表答對。可切換至「錯題詳解」查看解析。</p>
         </div>
       </div>
 
@@ -320,7 +325,7 @@
         <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 sm:p-6">
           <div class="text-xs font-bold text-gray-500 mb-3 text-center flex items-center justify-center gap-1">
             <i class="fa-solid fa-crown text-yellow-500"></i>
-            <span>英雄榜 (Top 10)</span>
+            <span>本次測驗成就</span>
           </div>
           <div id="leaderboard-container" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
           </div>
@@ -434,13 +439,13 @@
   </div>
 
   <script>
-    // 您部署的最新 Google Apps Script Web App API URL
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzzSqKxM5e_mAVbFKxledOkIWGDpfa6sfDFw7YRex5F5YIXEjc6J1xHIsb90wyQ5h4Y/exec";
+    // 您重新部署的最新 Google Apps Script Web App API URL
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycby7ZFDW3iOcW7dWcdQ9R3718GrmkNQUirPuBZlwditTEyd2jRRZJFQVf97zmGUmDQP8/exec";
 
-    // 備用演示數據 (當雲端 API 尚未建置題目時使用)
+    // 備用演示數據 (當雲端 API 離線時啟用)
     const MOCK_QUIZ_DATA = [
       {
-        id: 1,
+        id: "QUIZ_01_01",
         dimension: "文意理解",
         passage: "昔者莊周夢為胡蝶，栩栩然胡蝶也，自喻適志與！不知周也。俄然覺，則蘧蘧然周也。不知周之夢為胡蝶乎，胡蝶之夢為周乎？周與胡蝶，則必有分矣。此之謂物化。",
         question: "根據上文《莊周夢蝶》，莊子主要表達的哲學觀點為何？",
@@ -449,7 +454,7 @@
         explanation: "【解析】莊周夢蝶展現物我界限消融，達到萬物齊一、順應自然、物我合一的哲學超然境界。"
       },
       {
-        id: 2,
+        id: "QUIZ_01_02",
         dimension: "字詞語意",
         passage: "昔者莊周夢為胡蝶，栩栩然胡蝶也，自喻適志與！不知周也。俄然覺，則蘧蘧然周也。",
         question: "文中「俄然覺，則蘧蘧然周也」的「蘧蘧」意指為何？",
@@ -458,7 +463,7 @@
         explanation: "【解析】「蘧蘧」音ㄑㄩˊ，指驚覺、驚惶的樣子，形容夢醒時分突然發覺自己是莊周的狀態。"
       },
       {
-        id: 3,
+        id: "QUIZ_01_03",
         dimension: "修辭鑑賞",
         passage: "",
         question: "「美學並不是高高在上的殿堂知識，而是回到生活本身的溫柔。」這句話運用的主要修辭技巧為何？",
@@ -470,8 +475,7 @@
 
     const MOCK_USERS_DATA = [
       { className: "服二和", seatNumber: "1", name: "張小明", password: "1234" },
-      { className: "服二和", seatNumber: "2", name: "李小華", password: "1234" },
-      { className: "101", seatNumber: "1", name: "王大同", password: "1234" }
+      { className: "服二和", seatNumber: "2", name: "李小華", password: "1234" }
     ];
 
     let allUsersData = [];
@@ -491,14 +495,15 @@
       statusTag.innerText = "雲端連線中...";
 
       try {
-        const response = await fetch(`${GAS_API_URL}?action=getInitialData`);
+        const quizId = document.getElementById('select-quiz').value || "QUIZ_01";
+        const response = await fetch(`${GAS_API_URL}?action=getInitialData&quizId=${encodeURIComponent(quizId)}`);
         const result = await response.json();
 
         if (result.status === 'success') {
           statusTag.innerText = "雲端線上資料庫已連線";
 
-          allUsersData = result.students && result.students.length > 0 ? result.students : MOCK_USERS_DATA;
-          currentQuizData = result.questions && result.questions.length > 0 ? result.questions : MOCK_QUIZ_DATA;
+          allUsersData = (result.students && result.students.length > 0) ? result.students : MOCK_USERS_DATA;
+          currentQuizData = (result.questions && result.questions.length > 0) ? result.questions : MOCK_QUIZ_DATA;
 
           initClassOptions();
         } else {
@@ -538,6 +543,7 @@
       studentSelect.innerHTML = '';
 
       if (filteredUsers.length > 0) {
+        filteredUsers.sort((a, b) => Number(a.seatNumber) - Number(b.seatNumber));
         filteredUsers.forEach(u => {
           const paddedSeat = String(u.seatNumber).padStart(2, '0');
           studentSelect.innerHTML += `<option value="${u.seatNumber}" data-name="${u.name}" data-class="${u.className}" data-pwd="${u.password || '1234'}">${paddedSeat}號 ${u.name}</option>`;
@@ -575,6 +581,7 @@
       const classSelect = document.getElementById('input-class');
       const studentSelect = document.getElementById('select-student');
       const inputPwd = document.getElementById('input-password').value.trim();
+      const quizId = document.getElementById('select-quiz').value;
 
       let className = classSelect.value;
       let seatNumber = "";
@@ -622,7 +629,7 @@
         }
       }
 
-      currentUser = { className, seatNumber, name };
+      currentUser = { className, seatNumber, name, quizId };
 
       if (!currentQuizData || currentQuizData.length === 0) {
         currentQuizData = MOCK_QUIZ_DATA;
@@ -647,8 +654,8 @@
       const mobileBtn = document.getElementById('btn-mobile-passage');
 
       if (q.passage && q.passage.trim() !== "") {
-        document.getElementById('passage-text').innerText = q.passage;
-        document.getElementById('mobile-passage-text').innerText = q.passage;
+        document.getElementById('passage-text').innerHTML = q.passage;
+        document.getElementById('mobile-passage-text').innerHTML = q.passage;
         passageWrapper.classList.remove('hidden');
         questionWrapper.classList.remove('md:col-span-12');
         questionWrapper.classList.add('md:col-span-7');
@@ -723,17 +730,22 @@
       showToast("批改分析中，請稍候...", "fa-spinner fa-spin");
 
       let correctCount = 0;
-      let dimensionStats = {}; // { "文意理解": { correct: 1, total: 2 } }
+      let dimensionStats = {}; // { "文言文推論": { correct: 1, total: 2 } }
       let wrongQuestions = [];
+      let wrongTags = {};
 
       currentQuizData.forEach((q, idx) => {
         const userAnsIdx = userAnswers[idx];
         const isCorrect = (userAnsIdx === q.answer);
-        
-        if (isCorrect) correctCount++;
-        else wrongQuestions.push(idx + 1);
-
         const dim = q.dimension || "國文綜合力";
+        
+        if (isCorrect) {
+          correctCount++;
+        } else {
+          wrongQuestions.push(idx + 1);
+          wrongTags[dim] = (wrongTags[dim] || 0) + 1;
+        }
+
         if (!dimensionStats[dim]) dimensionStats[dim] = { correct: 0, total: 0 };
         dimensionStats[dim].total++;
         if (isCorrect) dimensionStats[dim].correct++;
@@ -751,13 +763,15 @@
       // 後端寫入測驗紀錄
       const payload = {
         action: "submitQuiz",
+        quizId: currentUser.quizId || "QUIZ_01",
         className: currentUser.className,
         seatNumber: currentUser.seatNumber,
         name: currentUser.name,
         score: score,
         correctCount: correctCount,
         wrongQuestions: wrongQuestions,
-        radarData: radarData
+        radarData: radarData,
+        wrongTags: wrongTags
       };
 
       try {
@@ -826,9 +840,9 @@
 
       const insightBox = document.getElementById('ai-insight-box');
       if (minScore < 100 && weakTag) {
-        insightBox.innerHTML = `<i class="fa-solid fa-lightbulb text-brand-600 mr-1"></i><strong>弱點診斷：</strong>你在「<strong>${weakTag}</strong>」掌握度較低（${minScore}%），建議對照「錯題詳解」頁籤補強複習！`;
+        insightBox.innerHTML = `<i class="fa-solid fa-lightbulb text-brand-600 mr-1"></i><strong>弱點診斷：</strong>你在「<strong>${weakTag}</strong>」向度掌握度較低（${minScore}%），建議對照「錯題詳解」頁籤補強複習！`;
       } else {
-        insightBox.innerHTML = `<i class="fa-solid fa-award text-brand-600 mr-1"></i><strong>表現出色：</strong>你在各能力維度表現均非常優異，請繼續保持！`;
+        insightBox.innerHTML = `<i class="fa-solid fa-award text-brand-600 mr-1"></i><strong>表現出色：</strong>你在各能力向度表現均非常優異，請繼續保持！`;
       }
 
       const ctx = document.getElementById('radarChart').getContext('2d');
@@ -875,7 +889,7 @@
         data: {
           labels: labels,
           datasets: [{
-            label: '個人錯題記錄',
+            label: '個人作答狀況',
             data: dataValues,
             backgroundColor: dataValues.map(v => v === 1 ? 'rgba(201, 42, 42, 0.8)' : 'rgba(34, 197, 94, 0.6)'),
             borderRadius: 8,
@@ -899,12 +913,12 @@
     function renderLeaderboard() {
       const container = document.getElementById('leaderboard-container');
       container.innerHTML = `
-        <div class="flex items-center justify-between p-2.5 rounded-xl bg-white border border-gray-100 text-sm font-bold">
+        <div class="flex items-center justify-between p-3 rounded-xl bg-white border border-gray-100 text-sm font-bold shadow-sm">
           <div class="flex items-center gap-3 text-gray-800">
-            <span class="w-6 h-6 rounded-full bg-yellow-400 text-white text-xs flex items-center justify-center shadow"><i class="fa-solid fa-crown"></i></span>
-            <span>${currentUser.name || "目前使用者"}</span>
+            <span class="w-7 h-7 rounded-full bg-yellow-400 text-white text-xs flex items-center justify-center shadow"><i class="fa-solid fa-crown"></i></span>
+            <span>${currentUser.className || ''} ${currentUser.name || "目前使用者"}</span>
           </div>
-          <div class="text-brand-600">${document.getElementById('result-score').innerText} <span class="text-xs text-gray-400 font-normal">分</span></div>
+          <div class="text-brand-600 font-black text-base">${document.getElementById('result-score').innerText} <span class="text-xs text-gray-400 font-normal">分</span></div>
         </div>
       `;
     }
@@ -1001,7 +1015,7 @@
             card.className = "bg-gray-50 border border-gray-100 p-4 rounded-xl flex items-center justify-between";
             card.innerHTML = `
               <div>
-                <div class="font-bold text-gray-800 text-sm">國文科單元測驗</div>
+                <div class="font-bold text-gray-800 text-sm">${item.quizId || '國文科單元測驗'}</div>
                 <div class="text-xs text-gray-400 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${item.timestamp}</div>
               </div>
               <div class="text-lg font-black text-brand-600">${item.score} <span class="text-xs text-gray-500 font-normal">分</span></div>
