@@ -132,8 +132,8 @@
           <label class="block text-xs font-bold text-gray-600 mb-1">
             <i class="fa-solid fa-layer-group text-brand-600 mr-1"></i>測驗單元
           </label>
-          <select id="select-quiz" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm font-medium transition">
-            <option value="QUIZ_01">QUIZ_01 - 經典文學閱讀與理解</option>
+          <select id="select-quiz" onchange="onQuizUnitChange()" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm font-medium transition">
+            <option value="">載入測驗單元中...</option>
           </select>
         </div>
 
@@ -211,7 +211,6 @@
         </button>
       </div>
 
-      <!-- 頁尾署名 -->
       <div class="text-center text-[11px] text-gray-400 mt-8">
         高雄市立三民家商國文科黃一軒設計
       </div>
@@ -221,7 +220,7 @@
     <section id="view-quiz" class="view-section p-5 sm:p-8">
       <div class="flex items-center justify-between mb-3">
         <span id="quiz-unit-label" class="bg-red-50 text-brand-600 text-xs font-bold px-3 py-1 rounded-full border border-red-100">
-          測驗進行中
+          測驗單元
         </span>
         <div class="text-sm font-black text-gray-700">
           <span id="current-q-index" class="text-brand-600 text-lg">1</span> / <span id="total-q-count">10</span>
@@ -289,10 +288,10 @@
           <i class="fa-solid fa-chart-pie mr-1"></i>能力雷達
         </button>
         <button id="tab-btn-2" onclick="switchResultTab(2)" class="result-tab-btn py-2.5 rounded-xl text-center text-gray-600 hover:text-brand-600">
-          <i class="fa-solid fa-chart-column mr-1"></i>錯題分佈
+          <i class="fa-solid fa-chart-column mr-1"></i>錯題統計
         </button>
         <button id="tab-btn-3" onclick="switchResultTab(3)" class="result-tab-btn py-2.5 rounded-xl text-center text-gray-600 hover:text-brand-600">
-          <i class="fa-solid fa-trophy mr-1"></i>排行榜
+          <i class="fa-solid fa-trophy mr-1"></i>個人成就
         </button>
         <button id="tab-btn-4" onclick="switchResultTab(4)" class="result-tab-btn py-2.5 rounded-xl text-center text-gray-600 hover:text-brand-600">
           <i class="fa-solid fa-file-circle-check mr-1"></i>錯題詳解
@@ -313,11 +312,11 @@
 
       <div id="tab-content-2" class="tab-content space-y-4">
         <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 sm:p-6">
-          <div class="text-xs font-bold text-gray-500 mb-2 text-center">個人各題作答正確狀態</div>
+          <div class="text-xs font-bold text-gray-500 mb-2 text-center">本次各題作答正確分佈</div>
           <div class="w-full max-w-md mx-auto mb-2">
             <canvas id="barChart"></canvas>
           </div>
-          <p class="text-xs text-gray-400 text-center">紅色代表該題答錯，綠色代表答對。可切換至「錯題詳解」查看解析。</p>
+          <p class="text-xs text-gray-400 text-center">紅色表示答錯題號，綠色表示答對。可切換至「錯題詳解」查看解析。</p>
         </div>
       </div>
 
@@ -439,49 +438,13 @@
   </div>
 
   <script>
-    // 您重新部署的最新 Google Apps Script Web App API URL
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycby7ZFDW3iOcW7dWcdQ9R3718GrmkNQUirPuBZlwditTEyd2jRRZJFQVf97zmGUmDQP8/exec";
-
-    // 備用演示數據 (當雲端 API 離線時啟用)
-    const MOCK_QUIZ_DATA = [
-      {
-        id: "QUIZ_01_01",
-        dimension: "文意理解",
-        passage: "昔者莊周夢為胡蝶，栩栩然胡蝶也，自喻適志與！不知周也。俄然覺，則蘧蘧然周也。不知周之夢為胡蝶乎，胡蝶之夢為周乎？周與胡蝶，則必有分矣。此之謂物化。",
-        question: "根據上文《莊周夢蝶》，莊子主要表達的哲學觀點為何？",
-        options: ["人生苦短，應當及時行樂與尋求美感", "萬物齊一與物我合一的超然境界", "夢境皆為虛幻，不可信以為真", "強調儒家仁者愛人與社會責任"],
-        answer: 1,
-        explanation: "【解析】莊周夢蝶展現物我界限消融，達到萬物齊一、順應自然、物我合一的哲學超然境界。"
-      },
-      {
-        id: "QUIZ_01_02",
-        dimension: "字詞語意",
-        passage: "昔者莊周夢為胡蝶，栩栩然胡蝶也，自喻適志與！不知周也。俄然覺，則蘧蘧然周也。",
-        question: "文中「俄然覺，則蘧蘧然周也」的「蘧蘧」意指為何？",
-        options: ["驚喜雀躍的樣子", "驚惶或驚覺的樣子", "悠閒自得的樣子", "昏昏欲睡的樣子"],
-        answer: 1,
-        explanation: "【解析】「蘧蘧」音ㄑㄩˊ，指驚覺、驚惶的樣子，形容夢醒時分突然發覺自己是莊周的狀態。"
-      },
-      {
-        id: "QUIZ_01_03",
-        dimension: "修辭鑑賞",
-        passage: "",
-        question: "「美學並不是高高在上的殿堂知識，而是回到生活本身的溫柔。」這句話運用的主要修辭技巧為何？",
-        options: ["映襯", "譬喻", "誇飾", "轉品"],
-        answer: 0,
-        explanation: "【解析】以「高高在上的殿堂知識」與「回到生活本身的溫柔」形成對比，運用對立屬性相互襯托，屬於「映襯」修辭。"
-      }
-    ];
-
-    const MOCK_USERS_DATA = [
-      { className: "服二和", seatNumber: "1", name: "張小明", password: "1234" },
-      { className: "服二和", seatNumber: "2", name: "李小華", password: "1234" }
-    ];
 
     let allUsersData = [];
     let currentQuizData = [];
+    let availableUnits = [];
     let currentQuestionIndex = 0;
-    let userAnswers = {}; // key: questionIndex, value: selectedOptionIndex (0-3)
+    let userAnswers = {};
     let currentUser = {};
     let radarChartInstance = null;
     let barChartInstance = null;
@@ -495,29 +458,71 @@
       statusTag.innerText = "雲端連線中...";
 
       try {
-        const quizId = document.getElementById('select-quiz').value || "QUIZ_01";
-        const response = await fetch(`${GAS_API_URL}?action=getInitialData&quizId=${encodeURIComponent(quizId)}`);
+        const response = await fetch(`${GAS_API_URL}?action=getInitialData`);
         const result = await response.json();
 
         if (result.status === 'success') {
           statusTag.innerText = "雲端線上資料庫已連線";
 
-          allUsersData = (result.students && result.students.length > 0) ? result.students : MOCK_USERS_DATA;
-          currentQuizData = (result.questions && result.questions.length > 0) ? result.questions : MOCK_QUIZ_DATA;
+          allUsersData = result.students || [];
+          
+          // 解析題庫與可選單元清單
+          if (result.questions && result.questions.length > 0) {
+            currentQuizData = result.questions;
+          }
+          
+          if (result.units && result.units.length > 0) {
+            availableUnits = result.units;
+          } else {
+            // 自動從題目中抓取單元名稱
+            availableUnits = ["B4L1鴻門宴", "B4L2黃同學"];
+          }
 
+          renderUnitOptions();
           initClassOptions();
         } else {
-          statusTag.innerText = "演示模式 (試算表未設定)";
-          allUsersData = MOCK_USERS_DATA;
-          currentQuizData = MOCK_QUIZ_DATA;
-          initClassOptions();
+          statusTag.innerText = "連線異常，切換至演示模式";
+          fallbackMockData();
         }
       } catch (e) {
         console.warn("GAS 遠端連線問題，切換至演示模式：", e);
         statusTag.innerText = "演示模式";
-        allUsersData = MOCK_USERS_DATA;
-        currentQuizData = MOCK_QUIZ_DATA;
-        initClassOptions();
+        fallbackMockData();
+      }
+    }
+
+    function fallbackMockData() {
+      availableUnits = ["B4L1鴻門宴", "B4L2黃同學"];
+      renderUnitOptions();
+      allUsersData = [
+        { className: "服二和", seatNumber: "1", name: "張小明", password: "1234" },
+        { className: "服二和", seatNumber: "2", name: "李小華", password: "1234" }
+      ];
+      initClassOptions();
+    }
+
+    function renderUnitOptions() {
+      const quizSelect = document.getElementById('select-quiz');
+      quizSelect.innerHTML = '';
+      availableUnits.forEach(unit => {
+        quizSelect.innerHTML += `<option value="${unit}">${unit}</option>`;
+      });
+    }
+
+    async function onQuizUnitChange() {
+      const selectedUnit = document.getElementById('select-quiz').value;
+      if (!selectedUnit) return;
+
+      showToast(`正在載入【${selectedUnit}】單元題目...`, "fa-spinner fa-spin");
+      try {
+        const response = await fetch(`${GAS_API_URL}?action=getInitialData&quizId=${encodeURIComponent(selectedUnit)}`);
+        const result = await response.json();
+        if (result.status === 'success' && result.questions && result.questions.length > 0) {
+          currentQuizData = result.questions;
+          showToast(`已載入【${selectedUnit}】共 ${currentQuizData.length} 題`, "fa-circle-check");
+        }
+      } catch (e) {
+        console.warn("無法取得該單元題目", e);
       }
     }
 
@@ -597,7 +602,6 @@
           return;
         }
 
-        // 新增至後端
         try {
           fetch(GAS_API_URL, {
             method: 'POST',
@@ -631,10 +635,24 @@
 
       currentUser = { className, seatNumber, name, quizId };
 
+      // 若目前單元題目尚未拉取完畢，即刻透過 API 載入
       if (!currentQuizData || currentQuizData.length === 0) {
-        currentQuizData = MOCK_QUIZ_DATA;
+        showToast("載入試卷中...", "fa-spinner fa-spin");
+        try {
+          const response = await fetch(`${GAS_API_URL}?action=getInitialData&quizId=${encodeURIComponent(quizId)}`);
+          const result = await response.json();
+          if (result.status === 'success' && result.questions && result.questions.length > 0) {
+            currentQuizData = result.questions;
+          }
+        } catch(e) {}
       }
 
+      if (!currentQuizData || currentQuizData.length === 0) {
+        showToast("查無該單元題目，請確認試算表設定！", "fa-triangle-exclamation");
+        return;
+      }
+
+      document.getElementById('quiz-unit-label').innerText = quizId || '測驗單元';
       currentQuestionIndex = 0;
       userAnswers = {};
       renderQuestion();
@@ -653,7 +671,10 @@
       const questionWrapper = document.getElementById('question-wrapper');
       const mobileBtn = document.getElementById('btn-mobile-passage');
 
-      if (q.passage && q.passage.trim() !== "") {
+      // 文章文本防呆處理
+      const hasPassage = q.passage && String(q.passage).trim() !== "" && String(q.passage).trim() !== "null" && String(q.passage).trim() !== "undefined";
+
+      if (hasPassage) {
         document.getElementById('passage-text').innerHTML = q.passage;
         document.getElementById('mobile-passage-text').innerHTML = q.passage;
         passageWrapper.classList.remove('hidden');
@@ -730,7 +751,7 @@
       showToast("批改分析中，請稍候...", "fa-spinner fa-spin");
 
       let correctCount = 0;
-      let dimensionStats = {}; // { "文言文推論": { correct: 1, total: 2 } }
+      let dimensionStats = {};
       let wrongQuestions = [];
       let wrongTags = {};
 
@@ -753,17 +774,15 @@
 
       const score = Math.round((correctCount / currentQuizData.length) * 100);
 
-      // 計算各能力向度得分率 (%)
       let radarData = {};
       Object.keys(dimensionStats).forEach(dim => {
         const stat = dimensionStats[dim];
         radarData[dim] = Math.round((stat.correct / stat.total) * 100);
       });
 
-      // 後端寫入測驗紀錄
       const payload = {
         action: "submitQuiz",
-        quizId: currentUser.quizId || "QUIZ_01",
+        quizId: currentUser.quizId || "B4L1鴻門宴",
         className: currentUser.className,
         seatNumber: currentUser.seatNumber,
         name: currentUser.name,
@@ -1030,7 +1049,6 @@
       }
     }
 
-    /* 修改密碼控制 */
     function openPasswordModal() {
       const studentSelect = document.getElementById('select-student');
       if (!studentSelect.value || studentSelect.value === 'NEW_USER') {
@@ -1079,14 +1097,12 @@
 
       showToast("正在同步更新密碼...", "fa-spinner fa-spin");
 
-      // 更新前端暫存
       const user = allUsersData.find(u => 
         String(u.className).trim() === String(className).trim() && 
         String(u.seatNumber).trim() === String(seatNumber).trim()
       );
       if (user) user.password = newPwd;
 
-      // 發送至 GAS 後端
       try {
         const payload = {
           action: "changePassword",
