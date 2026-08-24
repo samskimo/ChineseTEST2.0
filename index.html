@@ -415,8 +415,8 @@
   </div>
 
   <script>
-    // 您最新發布的 Google Apps Script Web App API URL
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyGfEeW2xSBJ1UDsSue7NG0-E0QVidpw0KvUQgvYBjMsHkVxvxziwpiP5Rq30nZ9Eln/exec";
+    // 您部署的 Google Apps Script Web App API URL
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyE_0TRb93bQ9UfUKJlLFyEovlJHg76GPeSvsmNR3vnBrRmlrcN4F2rsQCSbzlgyYQ/exec";
 
     let allUsersData = [];
     let currentQuizData = [];
@@ -441,7 +441,7 @@
         const result = await response.json();
 
         if (result.status === 'success') {
-          statusTag.innerText = "雲端線上資料庫已連線";
+          statusTag.innerText = "雲端線上資料庫已連線 (安全加密)";
           allUsersData = result.students || [];
           availableUnits = (result.units && result.units.length > 0) ? result.units : ["B4L1鴻門宴", "B4L2黃同學"];
           
@@ -509,7 +509,7 @@
         filteredUsers.sort((a, b) => Number(a.seatNumber) - Number(b.seatNumber));
         filteredUsers.forEach(u => {
           const paddedSeat = String(u.seatNumber).padStart(2, '0');
-          studentSelect.innerHTML += `<option value="${u.seatNumber}" data-name="${u.name}" data-class="${u.className}" data-email="${u.email || ''}" data-pwd="${u.password || '1234'}">${paddedSeat}號 ${u.name}</option>`;
+          studentSelect.innerHTML += `<option value="${u.seatNumber}" data-name="${u.name}" data-class="${u.className}">${paddedSeat}號 ${u.name}</option>`;
         });
       }
       studentSelect.innerHTML += `<option value="NEW_USER">➕ 找不到名字？（臨時新增）</option>`;
@@ -528,15 +528,6 @@
         manualFields.classList.add('hidden');
         registeredNotice.classList.remove('hidden');
       }
-    }
-
-    function verifyPassword(className, seatNumber, inputPwd) {
-      const user = allUsersData.find(u => 
-        String(u.className).trim() === String(className).trim() && 
-        Number(u.seatNumber) === Number(seatNumber)
-      );
-      const expected = user ? (user.password || '1234') : '1234';
-      return String(inputPwd).trim() === String(expected).trim();
     }
 
     async function startQuiz() {
@@ -575,20 +566,38 @@
             })
           });
         } catch(e) {}
-        allUsersData.push({ className, seatNumber, name, email, password: "1234" });
+        allUsersData.push({ className, seatNumber, name });
       } else {
         const selectedOpt = studentSelect.options[studentSelect.selectedIndex];
         seatNumber = studentSelect.value;
         name = selectedOpt.getAttribute('data-name');
-        email = selectedOpt.getAttribute('data-email') || '';
 
         if (!inputPwd) {
           showToast("請輸入登入密碼！", "fa-lock");
           return;
         }
 
-        if (!verifyPassword(className, seatNumber, inputPwd)) {
-          showToast("密碼錯誤，請重新確認！", "fa-circle-xmark");
+        // 後端密碼驗證
+        showToast("身分驗證中...", "fa-spinner fa-spin");
+        try {
+          const authRes = await fetch(GAS_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: "verifyLogin",
+              className: className,
+              seatNumber: seatNumber,
+              password: inputPwd
+            })
+          });
+          const authJson = await authRes.json();
+          if (authJson.status !== 'success') {
+            showToast(authJson.message || "密碼錯誤！", "fa-circle-xmark");
+            return;
+          }
+          email = authJson.email || "";
+        } catch(err) {
+          showToast("網路連線異常，請稍後重試！", "fa-circle-exclamation");
           return;
         }
       }
@@ -1012,6 +1021,7 @@
       });
     }
 
+    // 歷程紀錄：後端驗證密碼後查詢
     async function fetchHistory() {
       const classSelect = document.getElementById('input-class');
       const studentSelect = document.getElementById('select-student');
@@ -1021,34 +1031,35 @@
       let seatNumber = studentSelect.value;
 
       if (!seatNumber || seatNumber === 'NEW_USER') {
-        seatNumber = document.getElementById('input-seat').value;
-        className = document.getElementById('input-manual-class').value || className;
-        if (!seatNumber) {
-          showToast("請選擇或輸入學生座號！", "fa-triangle-exclamation");
-          return;
-        }
-      } else {
-        if (!inputPwd) {
-          showToast("查詢個人紀錄請輸入密碼！", "fa-lock");
-          return;
-        }
-        if (!verifyPassword(className, seatNumber, inputPwd)) {
-          showToast("密碼錯誤，無法查詢紀錄！", "fa-circle-xmark");
-          return;
-        }
+        showToast("請先選擇要查詢的學生！", "fa-triangle-exclamation");
+        return;
+      }
+
+      if (!inputPwd) {
+        showToast("查詢個人紀錄請輸入密碼！", "fa-lock");
+        return;
       }
 
       const container = document.getElementById('history-list-container');
       container.innerHTML = `
         <div class="text-center py-8 text-gray-400 text-sm">
           <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-brand-600 block"></i>
-          正在連線查詢歷次紀錄...
+          正在驗證身分並載入歷次紀錄...
         </div>
       `;
       showView('view-history');
 
       try {
-        const response = await fetch(`${GAS_API_URL}?action=getStudentRecords&className=${encodeURIComponent(className)}&seatNumber=${encodeURIComponent(seatNumber)}`);
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: "getStudentRecordsWithAuth",
+            className: className,
+            seatNumber: seatNumber,
+            password: inputPwd
+          })
+        });
         const result = await response.json();
 
         if (result.status === 'success' && result.records && result.records.length > 0) {
@@ -1066,7 +1077,7 @@
               }
             }
 
-            const hasWrong = (item.wrongSnapshot && item.wrongSnapshot.length > 0);
+            const hasWrong = (item.wrongSnapshot && item.wrongSnapshot.length > 0 && typeof item.wrongSnapshot[0] === 'object');
 
             const card = document.createElement('div');
             card.className = "bg-gray-50 border border-gray-100 p-4 rounded-2xl transition hover:shadow-sm";
@@ -1099,7 +1110,7 @@
             container.appendChild(card);
           });
         } else {
-          container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">尚無過去的測驗紀錄。</div>`;
+          container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">${result.message || '尚無過去的測驗紀錄。'}</div>`;
         }
       } catch (e) {
         container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">無法連線至雲端紀錄庫。</div>`;
@@ -1204,11 +1215,6 @@
         return;
       }
 
-      if (!verifyPassword(className, seatNumber, oldPwd)) {
-        showToast("原始密碼輸入不正確！", "fa-circle-xmark");
-        return;
-      }
-
       if (newPwd !== confirmPwd) {
         showToast("新密碼與確認密碼不吻合！", "fa-triangle-exclamation");
         return;
@@ -1219,13 +1225,7 @@
         return;
       }
 
-      showToast("正在同步更新密碼...", "fa-spinner fa-spin");
-
-      const user = allUsersData.find(u => 
-        String(u.className).trim() === String(className).trim() && 
-        Number(u.seatNumber) === Number(seatNumber)
-      );
-      if (user) user.password = newPwd;
+      showToast("正在加密更新密碼...", "fa-spinner fa-spin");
 
       try {
         const payload = {
@@ -1245,16 +1245,13 @@
         const result = await response.json();
         if (result.status === 'success') {
           showToast("密碼修改成功！請牢記新密碼", "fa-circle-check");
+          document.getElementById('input-password').value = newPwd;
+          closePasswordModal();
         } else {
-          showToast(result.message || "密碼已於本地更新", "fa-circle-check");
+          showToast(result.message || "密碼修改失敗", "fa-circle-xmark");
         }
-
-        document.getElementById('input-password').value = newPwd;
-        closePasswordModal();
       } catch (e) {
-        showToast("密碼已成功更新！", "fa-circle-check");
-        document.getElementById('input-password').value = newPwd;
-        closePasswordModal();
+        showToast("連線異常，請稍後再試！", "fa-circle-exclamation");
       }
     }
 
