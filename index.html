@@ -159,6 +159,19 @@
           </div>
         </div>
 
+        <!-- 密碼輸入欄位 -->
+        <div id="password-field-wrapper" class="space-y-1">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold text-gray-600">
+              <i class="fa-solid fa-key text-brand-600 mr-1"></i>登入密碼
+            </label>
+            <button type="button" onclick="openPasswordModal()" class="text-xs text-brand-600 hover:text-brand-700 font-bold hover:underline transition">
+              <i class="fa-solid fa-pen-to-square mr-1"></i>修改密碼？
+            </button>
+          </div>
+          <input type="password" id="input-password" placeholder="請輸入密碼 (預設: 1234)" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm font-medium transition">
+        </div>
+
         <!-- 臨時新增學生卡片 -->
         <div id="manual-student-fields" class="hidden space-y-3 bg-red-50/50 p-4 rounded-2xl border border-red-100 transition-all">
           <div class="text-xs font-bold text-brand-600 mb-1 flex items-center gap-1">
@@ -376,6 +389,47 @@
     </div>
   </div>
 
+  <!-- 修改密碼彈窗 -->
+  <div id="change-password-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-red-100">
+      <div class="p-5 bg-brand-600 text-white flex items-center justify-between font-bold">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>修改學生密碼</span>
+        </div>
+        <button onclick="closePasswordModal()" class="text-white hover:text-red-200 text-xl font-bold">&times;</button>
+      </div>
+      
+      <div class="p-6 space-y-4">
+        <p class="text-xs text-gray-500">修改密碼前，請選擇正確的學生並輸入舊密碼驗證身份。</p>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">原始舊密碼</label>
+          <input type="password" id="modal-old-password" placeholder="輸入目前密碼 (預設: 1234)" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">新密碼</label>
+          <input type="password" id="modal-new-password" placeholder="請輸入新密碼" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">再次確認新密碼</label>
+          <input type="password" id="modal-confirm-password" placeholder="再次輸入新密碼" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
+        </div>
+
+        <div class="pt-2 flex gap-2">
+          <button onclick="closePasswordModal()" class="w-1/2 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition">
+            取消
+          </button>
+          <button onclick="submitPasswordChange()" class="w-1/2 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-sm shadow-md transition">
+            確認修改
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast 輕量通知 -->
   <div id="custom-toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 transform -translate-y-12 opacity-0 transition-all duration-300 pointer-events-none">
     <div id="toast-body" class="bg-gray-900/90 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-xl text-sm font-medium flex items-center gap-2">
@@ -386,7 +440,7 @@
 
   <script>
     // Google Apps Script Web App API URL
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxFP_iaeyl57ZV452SPwDfzDxerDVZj6bE7q93vjd5ZWe_Fu4MLeGu74zCcfPkazHW2/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyZsnCV-9LHUQEMl_ebRVtIeiUV8mg76fYAWWuZiQLIOtTtHL035fqh13ktcf4304va/exec";
 
     // 離線/測試備用題庫
     const MOCK_QUIZ_DATA = [
@@ -429,9 +483,9 @@
     ];
 
     const MOCK_USERS_DATA = [
-      { userId: "服二和_01", className: "服二和", seatNum: "1", name: "張小明", email: "samskimo@gmail.com" },
-      { userId: "服二和_02", className: "服二和", seatNum: "2", name: "李小華", email: "samskimo@ms.smvhs.kh.edu.tw" },
-      { userId: "101_01", className: "101", seatNum: "1", name: "王大同", email: "student03@school.edu.tw" }
+      { userId: "服二和_01", className: "服二和", seatNum: "1", name: "張小明", email: "samskimo@gmail.com", password: "1234" },
+      { userId: "服二和_02", className: "服二和", seatNum: "2", name: "李小華", email: "samskimo@ms.smvhs.kh.edu.tw", password: "1234" },
+      { userId: "101_01", className: "101", seatNum: "1", name: "王大同", email: "student03@school.edu.tw", password: "1234" }
     ];
 
     let allUsersData = [];
@@ -505,7 +559,7 @@
       if (filteredUsers.length > 0) {
         filteredUsers.forEach(u => {
           const paddedSeat = u.seatNum.toString().padStart(2, '0');
-          studentSelect.innerHTML += `<option value="${u.userId}" data-name="${u.name}" data-email="${u.email}" data-seat="${u.seatNum}" data-class="${u.className}">${paddedSeat} ${u.name}</option>`;
+          studentSelect.innerHTML += `<option value="${u.userId}" data-name="${u.name}" data-email="${u.email}" data-seat="${u.seatNum}" data-class="${u.className}" data-pwd="${u.password || '1234'}">${paddedSeat} ${u.name}</option>`;
         });
       }
 
@@ -527,10 +581,18 @@
       }
     }
 
+    // 檢查密碼正確性 helper
+    function verifyStudentPassword(userId, inputPwd) {
+      const user = allUsersData.find(u => u.userId === userId);
+      const expectedPwd = user ? (user.password || '1234') : '1234';
+      return inputPwd === expectedPwd;
+    }
+
     async function startQuiz() {
       const classSelect = document.getElementById('input-class');
       const quizId = document.getElementById('select-quiz').value;
       const studentSelect = document.getElementById('select-student');
+      const inputPwd = document.getElementById('input-password').value.trim();
 
       let userId = "";
       let userName = "";
@@ -555,6 +617,16 @@
         userId = studentSelect.value;
         userName = selectedOpt.getAttribute('data-name');
         userEmail = selectedOpt.getAttribute('data-email') || "";
+
+        if (!inputPwd) {
+          showToast("請輸入登入密碼！", "fa-lock");
+          return;
+        }
+
+        if (!verifyStudentPassword(userId, inputPwd)) {
+          showToast("密碼錯誤，請重新確認！", "fa-circle-xmark");
+          return;
+        }
       }
 
       userInfo = {
@@ -599,9 +671,7 @@
       const questionWrapper = document.getElementById('question-wrapper');
       const mobileBtn = document.getElementById('btn-mobile-passage');
 
-      const hasPassage = q.passage && q.passage.trim() !== "";
-
-      if (hasPassage) {
+      if (q.passage && q.passage.trim() !== "") {
         document.getElementById('passage-text').innerText = q.passage;
         document.getElementById('mobile-passage-text').innerText = q.passage;
         passageWrapper.classList.remove('hidden');
@@ -950,6 +1020,7 @@
 
     async function fetchHistory() {
       const studentSelect = document.getElementById('select-student');
+      const inputPwd = document.getElementById('input-password').value.trim();
       let userId = studentSelect.value;
 
       if (!userId || userId === 'NEW_USER') {
@@ -960,6 +1031,15 @@
           return;
         }
         userId = `${className}_${seat}`;
+      } else {
+        if (!inputPwd) {
+          showToast("查詢個人紀錄請先輸入密碼！", "fa-lock");
+          return;
+        }
+        if (!verifyStudentPassword(userId, inputPwd)) {
+          showToast("密碼錯誤，無法查詢紀錄！", "fa-circle-xmark");
+          return;
+        }
       }
 
       const container = document.getElementById('history-list-container');
@@ -994,6 +1074,83 @@
         }
       } catch (e) {
         container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">尚無遠端歷次紀錄。</div>`;
+      }
+    }
+
+    /* 修改密碼 Modal 控制 */
+    function openPasswordModal() {
+      const studentSelect = document.getElementById('select-student');
+      if (!studentSelect.value || studentSelect.value === 'NEW_USER') {
+        showToast("請先選擇已註冊的學生！", "fa-user-check");
+        return;
+      }
+      document.getElementById('modal-old-password').value = '';
+      document.getElementById('modal-new-password').value = '';
+      document.getElementById('modal-confirm-password').value = '';
+      document.getElementById('change-password-modal').classList.remove('hidden');
+    }
+
+    function closePasswordModal() {
+      document.getElementById('change-password-modal').classList.add('hidden');
+    }
+
+    async function submitPasswordChange() {
+      const studentSelect = document.getElementById('select-student');
+      const userId = studentSelect.value;
+      const oldPwd = document.getElementById('modal-old-password').value.trim();
+      const newPwd = document.getElementById('modal-new-password').value.trim();
+      const confirmPwd = document.getElementById('modal-confirm-password').value.trim();
+
+      if (!oldPwd || !newPwd || !confirmPwd) {
+        showToast("所有密碼欄位皆為必填！", "fa-triangle-exclamation");
+        return;
+      }
+
+      if (!verifyStudentPassword(userId, oldPwd)) {
+        showToast("原始密碼輸入不正確！", "fa-circle-xmark");
+        return;
+      }
+
+      if (newPwd !== confirmPwd) {
+        showToast("新密碼與確認密碼不吻合！", "fa-triangle-exclamation");
+        return;
+      }
+
+      if (newPwd.length < 3) {
+        showToast("新密碼長度過短！", "fa-triangle-exclamation");
+        return;
+      }
+
+      showToast("正在更新密碼...", "fa-spinner fa-spin");
+
+      // 更新前端暫存資料
+      const user = allUsersData.find(u => u.userId === userId);
+      if (user) {
+        user.password = newPwd;
+      }
+
+      // 送出至後端 Google Apps Script
+      try {
+        const payload = {
+          action: "changePassword",
+          user_id: userId,
+          old_password: oldPwd,
+          new_password: newPwd
+        };
+
+        await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+
+        showToast("密碼修改成功！下次登入請使用新密碼", "fa-circle-check");
+        document.getElementById('input-password').value = newPwd;
+        closePasswordModal();
+      } catch (e) {
+        showToast("密碼已於本地更新！", "fa-circle-check");
+        document.getElementById('input-password').value = newPwd;
+        closePasswordModal();
       }
     }
 
