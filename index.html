@@ -219,7 +219,7 @@
 
         <div id="question-wrapper" class="md:col-span-12 space-y-4 flex flex-col justify-between">
           <div>
-            <h2 id="question-title" class="text-base sm:lg font-bold text-gray-800 leading-snug mb-4">
+            <h2 id="question-title" class="text-base sm:text-lg font-bold text-gray-800 leading-snug mb-4">
               題目載入中...
             </h2>
             <div id="options-list" class="space-y-3"></div>
@@ -343,6 +343,23 @@
 
   </main>
 
+  <!-- 歷程紀錄專用：錯題詳解回顧彈窗 -->
+  <div id="history-breakdown-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl border border-red-100">
+      <div class="p-4 sm:p-5 bg-brand-600 text-white flex items-center justify-between font-bold text-sm">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-file-circle-check text-lg"></i>
+          <span id="history-modal-title">測驗錯題回顧與解析</span>
+        </div>
+        <button onclick="closeHistoryModal()" class="text-white hover:text-red-200 text-xl font-black">&times;</button>
+      </div>
+      <div id="history-modal-content" class="p-4 sm:p-6 overflow-y-auto space-y-4"></div>
+      <div class="p-3 bg-gray-50 border-t border-gray-100 text-right">
+        <button onclick="closeHistoryModal()" class="px-5 py-2 bg-brand-600 text-white font-bold text-xs rounded-xl shadow-md">關閉視窗</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 行動端閱讀原文彈窗 -->
   <div id="mobile-passage-modal" class="fixed inset-0 bg-black/50 z-40 hidden flex items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
@@ -399,7 +416,7 @@
 
   <script>
     // 您最新發布的 Google Apps Script Web App API URL
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz9bZRCDFjwH9NQNrZZE8Gpoih5YslqDNHzHyff5cyJo8OyWbAT_58N1zaygTpDvduR/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzXsoBn9xhuz7mGw8O4gs2fUJKlfXC893_ySqbPtdAp3DvpEXQux9nztuFEeLFI4rY/exec";
 
     let allUsersData = [];
     let currentQuizData = [];
@@ -407,6 +424,7 @@
     let currentQuestionIndex = 0;
     let userAnswers = {};
     let currentUser = {};
+    let currentHistoryRecords = [];
     let radarChartInstance = null;
     let barChartInstance = null;
 
@@ -692,8 +710,10 @@
 
       let correctCount = 0;
       let dimensionStats = {};
-      let wrongQuestions = [];
+      let wrongSnapshot = [];
       let wrongTags = {};
+
+      const optionBadges = ["A", "B", "C", "D"];
 
       currentQuizData.forEach((q, idx) => {
         const userAnsIdx = userAnswers[idx];
@@ -703,7 +723,18 @@
         if (isCorrect) {
           correctCount++;
         } else {
-          wrongQuestions.push(idx + 1);
+          wrongSnapshot.push({
+            qIndex: idx + 1,
+            passage: q.passage || '',
+            question: q.question,
+            options: q.options,
+            userAnswerIdx: userAnsIdx !== undefined ? userAnsIdx : -1,
+            userAnswerText: userAnsIdx !== undefined ? optionBadges[userAnsIdx] : '未作答',
+            correctAnswerIdx: q.answer,
+            correctAnswerText: optionBadges[q.answer],
+            dimension: dim,
+            explanation: q.explanation || '無詳細解析'
+          });
           wrongTags[dim] = (wrongTags[dim] || 0) + 1;
         }
 
@@ -729,7 +760,8 @@
         email: currentUser.email || "",
         score: score,
         correctCount: correctCount,
-        wrongQuestions: wrongQuestions,
+        totalQuestions: currentQuizData.length,
+        wrongSnapshot: wrongSnapshot,
         radarData: radarData,
         wrongTags: wrongTags
       };
@@ -750,15 +782,16 @@
         statsData = await statsRes.json();
       } catch(e) {}
 
-      displayResult(score, radarData, wrongQuestions, statsData);
+      displayResult(score, radarData, wrongSnapshot, statsData);
     }
 
-    function displayResult(score, radarData, wrongQuestions, statsData) {
+    function displayResult(score, radarData, wrongSnapshot, statsData) {
       document.getElementById('result-score').innerText = score;
       document.getElementById('result-badge').innerText = getBadgeTitle(score);
 
+      const wrongQNums = wrongSnapshot.map(w => w.qIndex);
       drawRadarChart(radarData);
-      drawBarChart(wrongQuestions, statsData ? statsData.questionWrongCount : {});
+      drawBarChart(wrongQNums, statsData ? statsData.questionWrongCount : {});
       renderLeaderboard(score, statsData ? statsData.leaderboard : []);
       renderDetailedBreakdown();
 
@@ -1019,8 +1052,10 @@
         const result = await response.json();
 
         if (result.status === 'success' && result.records && result.records.length > 0) {
+          currentHistoryRecords = result.records;
           container.innerHTML = '';
-          result.records.forEach(item => {
+
+          result.records.forEach((item, index) => {
             let tagBadges = '';
             if (item.wrongTags && typeof item.wrongTags === 'object') {
               const tags = Object.keys(item.wrongTags);
@@ -1031,8 +1066,10 @@
               }
             }
 
+            const hasWrong = (item.wrongSnapshot && item.wrongSnapshot.length > 0);
+
             const card = document.createElement('div');
-            card.className = "bg-gray-50 border border-gray-100 p-4 rounded-2xl";
+            card.className = "bg-gray-50 border border-gray-100 p-4 rounded-2xl transition hover:shadow-sm";
             card.innerHTML = `
               <div class="flex items-center justify-between mb-2">
                 <div>
@@ -1041,9 +1078,22 @@
                 </div>
                 <div class="text-xl font-black text-brand-600">${item.score} <span class="text-xs text-gray-400 font-normal">分</span></div>
               </div>
-              <div class="pt-2 border-t border-gray-200/60 flex items-center justify-between text-xs">
-                <span class="text-gray-500 font-bold">弱點向度：</span>
-                <div class="flex flex-wrap gap-1">${tagBadges}</div>
+
+              <div class="pt-2 border-t border-gray-200/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+                <div class="flex items-center flex-wrap gap-1">
+                  <span class="text-gray-500 font-bold">弱點：</span>
+                  ${tagBadges}
+                </div>
+                <div>
+                  ${hasWrong ? `
+                    <button onclick="openHistoryBreakdown(${index})" class="text-xs bg-white text-brand-600 hover:bg-brand-600 hover:text-white border border-brand-200 px-3 py-1.5 rounded-xl font-bold shadow-sm transition flex items-center gap-1">
+                      <i class="fa-solid fa-file-circle-exclamation"></i>
+                      <span>重溫錯題詳解 (${item.wrongSnapshot.length})</span>
+                    </button>
+                  ` : `
+                    <span class="text-[11px] text-green-600 font-bold"><i class="fa-solid fa-circle-check mr-1"></i>完美全對</span>
+                  `}
+                </div>
               </div>
             `;
             container.appendChild(card);
@@ -1054,6 +1104,73 @@
       } catch (e) {
         container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">無法連線至雲端紀錄庫。</div>`;
       }
+    }
+
+    function openHistoryBreakdown(index) {
+      const record = currentHistoryRecords[index];
+      if (!record || !record.wrongSnapshot || record.wrongSnapshot.length === 0) return;
+
+      document.getElementById('history-modal-title').innerText = `【${record.quizId}】錯題回顧 (${record.timestamp})`;
+      const content = document.getElementById('history-modal-content');
+      content.innerHTML = '';
+
+      const optionBadges = ["A", "B", "C", "D"];
+
+      record.wrongSnapshot.forEach(item => {
+        const card = document.createElement('div');
+        card.className = "p-4 rounded-2xl bg-red-50/50 border border-red-200 text-sm leading-relaxed";
+
+        let passageHTML = '';
+        if (item.passage && item.passage.trim() !== '') {
+          passageHTML = `
+            <div class="mb-3 p-3 bg-stone-50 border border-stone-200 rounded-xl text-xs text-gray-700 font-serif whitespace-pre-line leading-relaxed">
+              <strong class="text-brand-600 block mb-1"><i class="fa-solid fa-book-bookmark mr-1"></i>閱讀引文：</strong>
+              ${item.passage}
+            </div>
+          `;
+        }
+
+        let optionsHTML = '';
+        if (Array.isArray(item.options)) {
+          item.options.forEach((optText, optIdx) => {
+            optionsHTML += `<div>(${optionBadges[optIdx]}) ${optText}</div>`;
+          });
+        }
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between font-bold mb-1.5">
+            <span class="text-brand-600 flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-xmark"></i>
+              第 ${item.qIndex} 題．向度：${item.dimension || '基礎力'}
+            </span>
+            <span class="text-xs px-2 py-0.5 rounded bg-red-100 text-brand-600">答錯</span>
+          </div>
+
+          ${passageHTML}
+
+          <p class="font-bold text-gray-800 mb-2">${item.question}</p>
+
+          <div class="bg-white/90 p-2.5 rounded-lg border border-red-100 text-xs text-gray-600 mb-2 space-y-1">
+            ${optionsHTML}
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs mb-2">
+            <div class="p-2 rounded bg-white border border-red-100">你的答案：<strong class="text-brand-600">${item.userAnswerText}</strong></div>
+            <div class="p-2 rounded bg-white border border-red-100">正確答案：<strong class="text-green-600">${item.correctAnswerText}</strong></div>
+          </div>
+
+          <div class="text-xs text-gray-700 bg-white/90 p-2.5 rounded-lg border border-red-100 whitespace-pre-line">
+            <strong class="text-gray-800"><i class="fa-solid fa-graduation-cap mr-1"></i>題目解析：</strong><br>${item.explanation}
+          </div>
+        `;
+        content.appendChild(card);
+      });
+
+      document.getElementById('history-breakdown-modal').classList.remove('hidden');
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('history-breakdown-modal').classList.add('hidden');
     }
 
     function openPasswordModal() {
