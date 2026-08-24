@@ -123,21 +123,21 @@
         </div>
 
         <h1 class="text-2xl sm:text-3xl font-black text-gray-800 tracking-tight">國文科雲端測驗系統</h1>
-        <p class="text-gray-500 text-sm mt-1">一期一會，全力以赴的智慧挑戰</p>
+        <p class="text-gray-500 text-sm mt-1">智慧化即時測驗與學習診斷平台</p>
       </div>
 
       <div class="space-y-4 max-w-md mx-auto">
         <!-- 選擇測驗單元 -->
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1">
-            <i class="fa-solid fa-layer-group text-brand-600 mr-1"></i>測驗單元 / 題目代碼
+            <i class="fa-solid fa-layer-group text-brand-600 mr-1"></i>測驗單元
           </label>
           <select id="select-quiz" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm font-medium transition">
-            <option value="QUIZ_01">QUIZ_01 - 生活美學的起點</option>
+            <option value="QUIZ_01">QUIZ_01 - 經典文學閱讀與理解</option>
           </select>
         </div>
 
-        <!-- 選擇班級連動學生 -->
+        <!-- 選擇班級與學生 -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-bold text-gray-600 mb-1">
@@ -145,13 +145,12 @@
             </label>
             <select id="input-class" onchange="onClassChange()" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm font-medium transition">
               <option value="服二和">服二和</option>
-              <option value="101">101 班</option>
             </select>
           </div>
 
           <div>
             <label class="block text-xs font-bold text-gray-600 mb-1">
-              <i class="fa-solid fa-user-check text-brand-600 mr-1"></i>座號與學生姓名
+              <i class="fa-solid fa-user-check text-brand-600 mr-1"></i>座號與姓名
             </label>
             <select id="select-student" onchange="onStudentSelectChange()" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm font-medium transition">
               <option value="">載入學生名單中...</option>
@@ -172,11 +171,11 @@
           <input type="password" id="input-password" placeholder="請輸入密碼 (預設: 1234)" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm font-medium transition">
         </div>
 
-        <!-- 臨時新增學生卡片 -->
+        <!-- 臨時新增學生欄位 -->
         <div id="manual-student-fields" class="hidden space-y-3 bg-red-50/50 p-4 rounded-2xl border border-red-100 transition-all">
           <div class="text-xs font-bold text-brand-600 mb-1 flex items-center gap-1">
             <i class="fa-solid fa-user-plus"></i>
-            <span>臨時新增學生填寫（填寫後將自動寫入試算表）</span>
+            <span>臨時新增學生（將自動寫入雲端試算表）</span>
           </div>
           <div class="grid grid-cols-3 gap-2">
             <div>
@@ -192,21 +191,17 @@
               <input type="text" id="input-name" placeholder="輸入姓名" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand-600">
             </div>
           </div>
-          <div>
-            <label class="block text-[11px] font-bold text-gray-500 mb-1">Email 信箱 (用於收取錯題解析報告)</label>
-            <input type="email" id="input-manual-email" placeholder="student@school.edu.tw" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand-600">
-          </div>
         </div>
 
-        <!-- 預設學生提示卡片 -->
+        <!-- 登入提示 -->
         <div id="registered-student-notice" class="bg-blue-50/80 border border-blue-200 rounded-2xl p-3 text-xs text-blue-800 flex items-center gap-2">
-          <i class="fa-solid fa-envelope-circle-check text-blue-600 text-lg flex-shrink-0"></i>
-          <span><strong>自動寄送提示：</strong>測驗完成後，系統將自動將「錯題解析報告」寄至您於學校預留的信箱，無須手動輸入 Email！</span>
+          <i class="fa-solid fa-shield-cat text-blue-600 text-lg flex-shrink-0"></i>
+          <span>預設密碼為 <strong>1234</strong>，首次登入建議先點擊右上方「修改密碼」更新個人密碼。</span>
         </div>
 
-        <!-- 按鈕區 -->
+        <!-- 操作按鈕 -->
         <button onclick="startQuiz()" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white font-bold rounded-xl shadow-lg shadow-red-200 transition flex items-center justify-center gap-2 text-base mt-2">
-          <span>參上！開始測驗</span>
+          <span>開始測驗</span>
           <i class="fa-solid fa-chevron-right text-xs"></i>
         </button>
 
@@ -249,7 +244,7 @@
             </h2>
 
             <div id="options-list" class="space-y-3">
-              <!-- 選項動態渲染 -->
+              <!-- 選項區域 -->
             </div>
           </div>
 
@@ -277,36 +272,36 @@
     <!-- 3. 結算與診斷分析視圖 -->
     <section id="view-result" class="view-section p-6 sm:p-10">
       <div class="bg-gradient-to-br from-brand-600 to-brand-700 text-white rounded-2xl p-6 text-center shadow-lg mb-6 relative overflow-hidden">
-        <div class="text-xs font-semibold tracking-widest text-red-200 uppercase mb-1">Final Score Result</div>
+        <div class="text-xs font-semibold tracking-widest text-red-200 uppercase mb-1">測驗總成績</div>
         <div id="result-score" class="text-6xl font-black my-2 tracking-tight">0</div>
         <div id="result-badge" class="inline-block bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold tracking-wide shadow-inner">
-          【江湖浪子・瀟灑隱士】
+          【評語稱號載入中】
         </div>
       </div>
 
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 bg-gray-100 rounded-2xl mb-6 text-xs sm:text-xs font-bold">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 bg-gray-100 rounded-2xl mb-6 text-xs font-bold">
         <button id="tab-btn-1" onclick="switchResultTab(1)" class="result-tab-btn active py-2.5 rounded-xl text-center">
-          <i class="fa-solid fa-chart-pie mr-1"></i>個人診斷
+          <i class="fa-solid fa-chart-pie mr-1"></i>能力雷達
         </button>
         <button id="tab-btn-2" onclick="switchResultTab(2)" class="result-tab-btn py-2.5 rounded-xl text-center text-gray-600 hover:text-brand-600">
-          <i class="fa-solid fa-chart-column mr-1"></i>全體錯題
+          <i class="fa-solid fa-chart-column mr-1"></i>錯題統計
         </button>
         <button id="tab-btn-3" onclick="switchResultTab(3)" class="result-tab-btn py-2.5 rounded-xl text-center text-gray-600 hover:text-brand-600">
-          <i class="fa-solid fa-trophy mr-1"></i>排行榜
+          <i class="fa-solid fa-trophy mr-1"></i>高分榜
         </button>
         <button id="tab-btn-4" onclick="switchResultTab(4)" class="result-tab-btn py-2.5 rounded-xl text-center text-gray-600 hover:text-brand-600">
-          <i class="fa-solid fa-file-circle-check mr-1"></i>錯題與詳解
+          <i class="fa-solid fa-file-circle-check mr-1"></i>錯題詳解
         </button>
       </div>
 
       <div id="tab-content-1" class="tab-content active space-y-4">
         <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 sm:p-6">
-          <div class="text-xs font-bold text-gray-500 mb-2 text-center">國文能力維度掌握度雷達圖 (%)</div>
+          <div class="text-xs font-bold text-gray-500 mb-2 text-center">國文能力維度掌握度 (%)</div>
           <div class="w-full max-w-xs mx-auto mb-4">
             <canvas id="radarChart"></canvas>
           </div>
           <div id="ai-insight-box" class="bg-red-50/70 border-l-4 border-brand-600 p-3.5 rounded-r-xl text-xs sm:text-sm text-brand-700 leading-relaxed">
-            正在分析您的表現...
+            正在分析您的學習表現...
           </div>
         </div>
       </div>
@@ -317,7 +312,7 @@
           <div class="w-full max-w-md mx-auto mb-2">
             <canvas id="barChart"></canvas>
           </div>
-          <p class="text-xs text-gray-400 text-center">呈現全班/全體填答者在各題的錯誤人次，協助老師精準檢討高頻錯題。</p>
+          <p class="text-xs text-gray-400 text-center">呈現班級各題錯誤率，方便針對高頻錯題進行重點複習。</p>
         </div>
       </div>
 
@@ -325,7 +320,7 @@
         <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 sm:p-6">
           <div class="text-xs font-bold text-gray-500 mb-3 text-center flex items-center justify-center gap-1">
             <i class="fa-solid fa-crown text-yellow-500"></i>
-            <span>單元高分英雄榜 (Top 10)</span>
+            <span>英雄榜 (Top 10)</span>
           </div>
           <div id="leaderboard-container" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
           </div>
@@ -340,7 +335,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
         <button onclick="location.reload()" class="w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition text-sm flex items-center justify-center gap-2">
           <i class="fa-solid fa-rotate-right"></i>
-          <span>重新測驗</span>
+          <span>再測一次</span>
         </button>
         <button onclick="fetchHistory()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-md transition text-sm flex items-center justify-center gap-2">
           <i class="fa-solid fa-list-check"></i>
@@ -395,21 +390,21 @@
       <div class="p-5 bg-brand-600 text-white flex items-center justify-between font-bold">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-shield-halved"></i>
-          <span>修改學生密碼</span>
+          <span>修改個人密碼</span>
         </div>
         <button onclick="closePasswordModal()" class="text-white hover:text-red-200 text-xl font-bold">&times;</button>
       </div>
       
       <div class="p-6 space-y-4">
-        <p class="text-xs text-gray-500">修改密碼前，請選擇正確的學生並輸入舊密碼驗證身份。</p>
+        <p class="text-xs text-gray-500">請確認目前所選班級與學生，並輸入舊密碼驗證身份。</p>
 
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1">原始舊密碼</label>
-          <input type="password" id="modal-old-password" placeholder="輸入目前密碼 (預設: 1234)" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
+          <input type="password" id="modal-old-password" placeholder="預設密碼為: 1234" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
         </div>
 
         <div>
-          <label class="block text-xs font-bold text-gray-600 mb-1">新密碼</label>
+          <label class="block text-xs font-bold text-gray-600 mb-1">設定新密碼</label>
           <input type="password" id="modal-new-password" placeholder="請輸入新密碼" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
         </div>
 
@@ -430,7 +425,7 @@
     </div>
   </div>
 
-  <!-- Toast 輕量通知 -->
+  <!-- Toast 通知 -->
   <div id="custom-toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 transform -translate-y-12 opacity-0 transition-all duration-300 pointer-events-none">
     <div id="toast-body" class="bg-gray-900/90 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-xl text-sm font-medium flex items-center gap-2">
       <i id="toast-icon" class="fa-solid fa-circle-info text-brand-500"></i>
@@ -439,60 +434,51 @@
   </div>
 
   <script>
-    // Google Apps Script Web App API URL
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyZsnCV-9LHUQEMl_ebRVtIeiUV8mg76fYAWWuZiQLIOtTtHL035fqh13ktcf4304va/exec";
+    // 您部署的最新 Google Apps Script Web App API URL
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzzSqKxM5e_mAVbFKxledOkIWGDpfa6sfDFw7YRex5F5YIXEjc6J1xHIsb90wyQ5h4Y/exec";
 
-    // 離線/測試備用題庫
+    // 備用演示數據 (當雲端 API 尚未建置題目時使用)
     const MOCK_QUIZ_DATA = [
       {
-        id: "Q01_01",
+        id: 1,
+        dimension: "文意理解",
         passage: "昔者莊周夢為胡蝶，栩栩然胡蝶也，自喻適志與！不知周也。俄然覺，則蘧蘧然周也。不知周之夢為胡蝶乎，胡蝶之夢為周乎？周與胡蝶，則必有分矣。此之謂物化。",
         question: "根據上文《莊周夢蝶》，莊子主要表達的哲學觀點為何？",
-        options: [
-          { key: "A", text: "人生苦短，應當及時行樂與尋求美感" },
-          { key: "B", text: "萬物齊一與物我合一的超然境界" },
-          { key: "C", text: "夢境皆為虛幻，不足採信" },
-          { key: "D", text: "強調儒家仁者愛人與社會責任" }
-        ],
-        tag: "文言文推論"
+        options: ["人生苦短，應當及時行樂與尋求美感", "萬物齊一與物我合一的超然境界", "夢境皆為虛幻，不可信以為真", "強調儒家仁者愛人與社會責任"],
+        answer: 1,
+        explanation: "【解析】莊周夢蝶展現物我界限消融，達到萬物齊一、順應自然、物我合一的哲學超然境界。"
       },
       {
-        id: "Q01_02",
-        passage: "昔者莊周夢為胡蝶，栩栩然胡蝶也，自喻適志與！不知周也。俄然覺，則蘧蘧然周也。不知周之夢為胡蝶乎，胡蝶之夢為周乎？周與胡蝶，則必有分矣。此之謂物化。",
+        id: 2,
+        dimension: "字詞語意",
+        passage: "昔者莊周夢為胡蝶，栩栩然胡蝶也，自喻適志與！不知周也。俄然覺，則蘧蘧然周也。",
         question: "文中「俄然覺，則蘧蘧然周也」的「蘧蘧」意指為何？",
-        options: [
-          { key: "A", text: "驚喜雀躍的樣子" },
-          { key: "B", text: "驚惶或驚覺的樣子" },
-          { key: "C", text: "悠閒自得的樣子" },
-          { key: "D", text: "昏昏欲睡的樣子" }
-        ],
-        tag: "字詞形音義"
+        options: ["驚喜雀躍的樣子", "驚惶或驚覺的樣子", "悠閒自得的樣子", "昏昏欲睡的樣子"],
+        answer: 1,
+        explanation: "【解析】「蘧蘧」音ㄑㄩˊ，指驚覺、驚惶的樣子，形容夢醒時分突然發覺自己是莊周的狀態。"
       },
       {
-        id: "Q01_03",
+        id: 3,
+        dimension: "修辭鑑賞",
         passage: "",
-        question: "「美學並不是高高在上的殿堂知識，而是回到生活本身。」這句話運用的主要修辭技巧為何？",
-        options: [
-          { key: "A", text: "映襯" },
-          { key: "B", text: "譬喻" },
-          { key: "C", text: "誇飾" },
-          { key: "D", text: "排比" }
-        ],
-        tag: "修辭鑑賞"
+        question: "「美學並不是高高在上的殿堂知識，而是回到生活本身的溫柔。」這句話運用的主要修辭技巧為何？",
+        options: ["映襯", "譬喻", "誇飾", "轉品"],
+        answer: 0,
+        explanation: "【解析】以「高高在上的殿堂知識」與「回到生活本身的溫柔」形成對比，運用對立屬性相互襯托，屬於「映襯」修辭。"
       }
     ];
 
     const MOCK_USERS_DATA = [
-      { userId: "服二和_01", className: "服二和", seatNum: "1", name: "張小明", email: "samskimo@gmail.com", password: "1234" },
-      { userId: "服二和_02", className: "服二和", seatNum: "2", name: "李小華", email: "samskimo@ms.smvhs.kh.edu.tw", password: "1234" },
-      { userId: "101_01", className: "101", seatNum: "1", name: "王大同", email: "student03@school.edu.tw", password: "1234" }
+      { className: "服二和", seatNumber: "1", name: "張小明", password: "1234" },
+      { className: "服二和", seatNumber: "2", name: "李小華", password: "1234" },
+      { className: "101", seatNumber: "1", name: "王大同", password: "1234" }
     ];
 
     let allUsersData = [];
     let currentQuizData = [];
     let currentQuestionIndex = 0;
-    let userAnswers = {};
-    let userInfo = {};
+    let userAnswers = {}; // key: questionIndex, value: selectedOptionIndex (0-3)
+    let currentUser = {};
     let radarChartInstance = null;
     let barChartInstance = null;
 
@@ -502,35 +488,30 @@
 
     async function initSystem() {
       const statusTag = document.getElementById('system-status');
-      statusTag.innerText = "連線中...";
+      statusTag.innerText = "雲端連線中...";
 
       try {
-        console.log("正在嘗試請求後端 API:", `${GAS_API_URL}?action=getInitData`);
-        const response = await fetch(`${GAS_API_URL}?action=getInitData`);
+        const response = await fetch(`${GAS_API_URL}?action=getInitialData`);
         const result = await response.json();
 
         if (result.status === 'success') {
-          statusTag.innerText = "雲端資料庫已連線";
-          
-          const quizSelect = document.getElementById('select-quiz');
-          if (result.data.quizList && result.data.quizList.length > 0) {
-            quizSelect.innerHTML = '';
-            result.data.quizList.forEach(qId => {
-              quizSelect.innerHTML += `<option value="${qId}">${qId}</option>`;
-            });
-          }
+          statusTag.innerText = "雲端線上資料庫已連線";
 
-          allUsersData = result.data.users && result.data.users.length > 0 ? result.data.users : MOCK_USERS_DATA;
+          allUsersData = result.students && result.students.length > 0 ? result.students : MOCK_USERS_DATA;
+          currentQuizData = result.questions && result.questions.length > 0 ? result.questions : MOCK_QUIZ_DATA;
+
           initClassOptions();
         } else {
-          statusTag.innerText = "備用預設選單";
+          statusTag.innerText = "演示模式 (試算表未設定)";
           allUsersData = MOCK_USERS_DATA;
+          currentQuizData = MOCK_QUIZ_DATA;
           initClassOptions();
         }
       } catch (e) {
-        console.warn("GAS 遠端連線未回應，切換至演示模式：", e);
+        console.warn("GAS 遠端連線問題，切換至演示模式：", e);
         statusTag.innerText = "演示模式";
         allUsersData = MOCK_USERS_DATA;
+        currentQuizData = MOCK_QUIZ_DATA;
         initClassOptions();
       }
     }
@@ -539,7 +520,7 @@
       const classSelect = document.getElementById('input-class');
       if (!allUsersData || allUsersData.length === 0) return;
 
-      const classes = [...new Set(allUsersData.map(u => u.className).filter(Boolean))];
+      const classes = [...new Set(allUsersData.map(u => String(u.className).trim()).filter(Boolean))];
       if (classes.length > 0) {
         classSelect.innerHTML = '';
         classes.forEach(c => {
@@ -551,19 +532,19 @@
 
     function onClassChange() {
       const selectedClass = document.getElementById('input-class').value;
-      const filteredUsers = allUsersData.filter(u => u.className.toString() === selectedClass.toString());
+      const filteredUsers = allUsersData.filter(u => String(u.className).trim() === String(selectedClass).trim());
       const studentSelect = document.getElementById('select-student');
 
       studentSelect.innerHTML = '';
 
       if (filteredUsers.length > 0) {
         filteredUsers.forEach(u => {
-          const paddedSeat = u.seatNum.toString().padStart(2, '0');
-          studentSelect.innerHTML += `<option value="${u.userId}" data-name="${u.name}" data-email="${u.email}" data-seat="${u.seatNum}" data-class="${u.className}" data-pwd="${u.password || '1234'}">${paddedSeat} ${u.name}</option>`;
+          const paddedSeat = String(u.seatNumber).padStart(2, '0');
+          studentSelect.innerHTML += `<option value="${u.seatNumber}" data-name="${u.name}" data-class="${u.className}" data-pwd="${u.password || '1234'}">${paddedSeat}號 ${u.name}</option>`;
         });
       }
 
-      studentSelect.innerHTML += `<option value="NEW_USER">➕ 找不到名字？（臨時新增學生）</option>`;
+      studentSelect.innerHTML += `<option value="NEW_USER">➕ 找不到名字？（臨時新增）</option>`;
       onStudentSelectChange();
     }
 
@@ -581,75 +562,69 @@
       }
     }
 
-    // 檢查密碼正確性 helper
-    function verifyStudentPassword(userId, inputPwd) {
-      const user = allUsersData.find(u => u.userId === userId);
-      const expectedPwd = user ? (user.password || '1234') : '1234';
-      return inputPwd === expectedPwd;
+    function verifyPassword(className, seatNumber, inputPwd) {
+      const user = allUsersData.find(u => 
+        String(u.className).trim() === String(className).trim() && 
+        String(u.seatNumber).trim() === String(seatNumber).trim()
+      );
+      const expected = user ? (user.password || '1234') : '1234';
+      return String(inputPwd).trim() === String(expected).trim();
     }
 
     async function startQuiz() {
       const classSelect = document.getElementById('input-class');
-      const quizId = document.getElementById('select-quiz').value;
       const studentSelect = document.getElementById('select-student');
       const inputPwd = document.getElementById('input-password').value.trim();
 
-      let userId = "";
-      let userName = "";
-      let userEmail = "";
+      let className = classSelect.value;
+      let seatNumber = "";
+      let name = "";
 
       if (studentSelect.value === 'NEW_USER' || !studentSelect.value) {
-        const seat = document.getElementById('input-seat').value.trim();
-        const manualClass = document.getElementById('input-manual-class').value.trim() || classSelect.value;
-        const name = document.getElementById('input-name').value.trim();
-        const email = document.getElementById('input-manual-email').value.trim();
+        seatNumber = document.getElementById('input-seat').value.trim();
+        className = document.getElementById('input-manual-class').value.trim() || className;
+        name = document.getElementById('input-name').value.trim();
 
-        if (!seat || !name) {
+        if (!seatNumber || !name) {
           showToast("請填寫臨時學生的座號與姓名！", "fa-triangle-exclamation");
           return;
         }
 
-        userId = `${manualClass}_${seat}`;
-        userName = name;
-        userEmail = email;
+        // 新增至後端
+        try {
+          fetch(GAS_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({
+              action: "addStudent",
+              className: className,
+              seatNumber: seatNumber,
+              name: name,
+              password: "1234"
+            })
+          });
+        } catch(e) {}
+
+        allUsersData.push({ className, seatNumber, name, password: "1234" });
       } else {
         const selectedOpt = studentSelect.options[studentSelect.selectedIndex];
-        userId = studentSelect.value;
-        userName = selectedOpt.getAttribute('data-name');
-        userEmail = selectedOpt.getAttribute('data-email') || "";
+        seatNumber = studentSelect.value;
+        name = selectedOpt.getAttribute('data-name');
 
         if (!inputPwd) {
           showToast("請輸入登入密碼！", "fa-lock");
           return;
         }
 
-        if (!verifyStudentPassword(userId, inputPwd)) {
+        if (!verifyPassword(className, seatNumber, inputPwd)) {
           showToast("密碼錯誤，請重新確認！", "fa-circle-xmark");
           return;
         }
       }
 
-      userInfo = {
-        userId: userId,
-        userName: userName,
-        email: userEmail,
-        quizId: quizId
-      };
+      currentUser = { className, seatNumber, name };
 
-      showToast("正在載入題目，請稍候...", "fa-spinner fa-spin");
-
-      try {
-        const response = await fetch(`${GAS_API_URL}?action=getQuiz&quiz_id=${quizId}`);
-        const result = await response.json();
-
-        if (result.status === 'success' && result.data && result.data.length > 0) {
-          currentQuizData = result.data;
-        } else {
-          showToast("載入演示題庫", "fa-circle-check");
-          currentQuizData = MOCK_QUIZ_DATA;
-        }
-      } catch (e) {
-        showToast("載入演示題庫", "fa-circle-check");
+      if (!currentQuizData || currentQuizData.length === 0) {
         currentQuizData = MOCK_QUIZ_DATA;
       }
 
@@ -685,22 +660,23 @@
         mobileBtn.classList.add('hidden');
       }
 
-      document.getElementById('question-title').innerText = `第 ${currentQuestionIndex + 1} 題．${q.question}`;
+      document.getElementById('question-title').innerText = `第 ${currentQuestionIndex + 1} 題．【${q.dimension || '基礎能力'}】${q.question}`;
       
       const optionsList = document.getElementById('options-list');
       optionsList.innerHTML = '';
 
-      q.options.forEach(opt => {
-        const isSelected = userAnswers[q.id] === opt.key;
+      const optionBadges = ["A", "B", "C", "D"];
+      q.options.forEach((optText, optIdx) => {
+        const isSelected = userAnswers[currentQuestionIndex] === optIdx;
         const card = document.createElement('div');
         card.className = `option-card p-3.5 sm:p-4 rounded-xl border border-gray-200 cursor-pointer flex items-center gap-3 ${isSelected ? 'selected' : 'bg-white hover:border-red-300'}`;
-        card.onclick = () => selectOption(q.id, opt.key);
+        card.onclick = () => selectOption(currentQuestionIndex, optIdx);
 
         card.innerHTML = `
           <div class="option-badge w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-bold flex items-center justify-center text-sm flex-shrink-0 transition">
-            ${opt.key}
+            ${optionBadges[optIdx]}
           </div>
-          <div class="text-sm sm:text-base font-medium leading-snug">${opt.text}</div>
+          <div class="text-sm sm:text-base font-medium leading-snug">${optText}</div>
         `;
         optionsList.appendChild(card);
       });
@@ -710,12 +686,12 @@
 
       btnPrev.style.visibility = (currentQuestionIndex === 0) ? 'hidden' : 'visible';
       btnNext.innerHTML = (currentQuestionIndex === total - 1) 
-        ? `<span>提交卷軸</span> <i class="fa-solid fa-paper-plane text-xs"></i>` 
+        ? `<span>提交答案</span> <i class="fa-solid fa-paper-plane text-xs"></i>` 
         : `<span>下一題</span> <i class="fa-solid fa-chevron-right text-xs"></i>`;
     }
 
-    function selectOption(qId, key) {
-      userAnswers[qId] = key;
+    function selectOption(qIdx, optIdx) {
+      userAnswers[qIdx] = optIdx;
       renderQuestion();
     }
 
@@ -744,94 +720,75 @@
     }
 
     async function submitQuiz() {
-      showToast("正在批改與分析，請稍候...", "fa-spinner fa-spin");
+      showToast("批改分析中，請稍候...", "fa-spinner fa-spin");
 
+      let correctCount = 0;
+      let dimensionStats = {}; // { "文意理解": { correct: 1, total: 2 } }
+      let wrongQuestions = [];
+
+      currentQuizData.forEach((q, idx) => {
+        const userAnsIdx = userAnswers[idx];
+        const isCorrect = (userAnsIdx === q.answer);
+        
+        if (isCorrect) correctCount++;
+        else wrongQuestions.push(idx + 1);
+
+        const dim = q.dimension || "國文綜合力";
+        if (!dimensionStats[dim]) dimensionStats[dim] = { correct: 0, total: 0 };
+        dimensionStats[dim].total++;
+        if (isCorrect) dimensionStats[dim].correct++;
+      });
+
+      const score = Math.round((correctCount / currentQuizData.length) * 100);
+
+      // 計算各能力向度得分率 (%)
+      let radarData = {};
+      Object.keys(dimensionStats).forEach(dim => {
+        const stat = dimensionStats[dim];
+        radarData[dim] = Math.round((stat.correct / stat.total) * 100);
+      });
+
+      // 後端寫入測驗紀錄
       const payload = {
-        quiz_id: userInfo.quizId,
-        user_id: userInfo.userId,
-        user_name: userInfo.userName,
-        user_email: userInfo.email,
-        answers: userAnswers
+        action: "submitQuiz",
+        className: currentUser.className,
+        seatNumber: currentUser.seatNumber,
+        name: currentUser.name,
+        score: score,
+        correctCount: correctCount,
+        wrongQuestions: wrongQuestions,
+        radarData: radarData
       };
 
       try {
-        const response = await fetch(GAS_API_URL, {
+        await fetch(GAS_API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
+      } catch(e) {}
 
-        const result = await response.json();
-
-        if (result.status === 'success') {
-          showToast("批改完成！發送報告中...", "fa-circle-check");
-          displayResult(result.score, result.userTagAccuracy, result.globalTagWrong, result.leaderboard, result.details);
-        } else {
-          calculateLocalResult();
-        }
-      } catch (e) {
-        calculateLocalResult();
-      }
+      displayResult(score, radarData, wrongQuestions);
     }
 
-    function calculateLocalResult() {
-      let correctCount = 0;
-      let details = {};
-
-      currentQuizData.forEach(q => {
-        const userAns = userAnswers[q.id] || "未作答";
-        const correctAns = "B"; 
-        const isCorrect = userAns === correctAns;
-        if (isCorrect) correctCount++;
-
-        let optionsMap = {};
-        q.options.forEach(o => optionsMap[o.key] = o.text);
-
-        details[q.id] = {
-          questionText: q.question,
-          passage: q.passage,
-          options: optionsMap,
-          userAns: userAns,
-          correctAns: correctAns,
-          isCorrect: isCorrect,
-          tag: q.tag,
-          explanation: `【正確解析】此題評量「${q.tag}」能力，正確選項應著重於文本旨趣之推論。`
-        };
-      });
-
-      const score = Math.round((correctCount / currentQuizData.length) * 100) || 66;
-      const mockUserTagAccuracy = { "字詞形音義": 100, "文言文推論": 50, "修辭鑑賞": 100 };
-      const mockGlobalStats = {
-        totalSubmissions: 15,
-        wrongPerQuestion: { "Q01_01": 8, "Q01_02": 3, "Q01_03": 5 }
-      };
-      const mockLeaderboard = [
-        { name: userInfo.userName || "張小明", score: score },
-        { name: "李小華", score: 90 },
-        { name: "王大同", score: 80 }
-      ];
-
-      displayResult(score, mockUserTagAccuracy, mockGlobalStats, mockLeaderboard, details);
-    }
-
-    function displayResult(score, userTagAccuracy, globalTagWrong, leaderboard, details) {
+    function displayResult(score, radarData, wrongQuestions) {
       document.getElementById('result-score').innerText = score;
       document.getElementById('result-badge').innerText = getBadgeTitle(score);
 
-      drawRadarChart(userTagAccuracy || { "字詞形音義": 80, "文言文推論": 60, "修辭鑑賞": 100 });
-      drawBarChart(globalTagWrong || { totalSubmissions: 10, wrongPerQuestion: { "Q01_01": 5, "Q01_02": 2, "Q01_03": 4 } });
-      renderLeaderboard(leaderboard || []);
-      renderDetailedBreakdown(details);
+      drawRadarChart(radarData);
+      drawBarChart(wrongQuestions);
+      renderLeaderboard();
+      renderDetailedBreakdown();
 
       switchResultTab(1);
       showView('view-result');
     }
 
     function getBadgeTitle(score) {
-      if (score === 100) return '【獨孤求敗・國文大宗師】';
+      if (score === 100) return '【國文大宗師・滿分滿譽】';
       if (score >= 80) return '【翰林學士・妙筆生花】';
-      if (score >= 60) return '【江湖浪子・瀟灑隱士】';
-      return '【潛心修鍊・再接再厲】';
+      if (score >= 60) return '【瀟灑文人・潛力無量】';
+      return '【基石穩固・再接再厲】';
     }
 
     function switchResultTab(tabIndex) {
@@ -854,24 +811,24 @@
       });
     }
 
-    function drawRadarChart(userTagAccuracy) {
-      const labels = Object.keys(userTagAccuracy);
-      const dataValues = Object.values(userTagAccuracy);
+    function drawRadarChart(radarData) {
+      const labels = Object.keys(radarData);
+      const dataValues = Object.values(radarData);
 
       let minScore = 100;
       let weakTag = '';
       labels.forEach(tag => {
-        if (userTagAccuracy[tag] < minScore) {
-          minScore = userTagAccuracy[tag];
+        if (radarData[tag] < minScore) {
+          minScore = radarData[tag];
           weakTag = tag;
         }
       });
 
       const insightBox = document.getElementById('ai-insight-box');
       if (minScore < 100 && weakTag) {
-        insightBox.innerHTML = `<i class="fa-solid fa-lightbulb text-brand-600 mr-1"></i><strong>弱點診斷：</strong>你在「<strong>${weakTag}</strong>」掌握度較低（${minScore}%），詳細錯題與解析已發送至 Email，建議優先對照評析進行補救複習！`;
+        insightBox.innerHTML = `<i class="fa-solid fa-lightbulb text-brand-600 mr-1"></i><strong>弱點診斷：</strong>你在「<strong>${weakTag}</strong>」掌握度較低（${minScore}%），建議對照「錯題詳解」頁籤補強複習！`;
       } else {
-        insightBox.innerHTML = `<i class="fa-solid fa-award text-brand-600 mr-1"></i><strong>表現出色：</strong>你在各項目能力表現均極為平均且傑出，請繼續保持！`;
+        insightBox.innerHTML = `<i class="fa-solid fa-award text-brand-600 mr-1"></i><strong>表現出色：</strong>你在各能力維度表現均非常優異，請繼續保持！`;
       }
 
       const ctx = document.getElementById('radarChart').getContext('2d');
@@ -906,11 +863,9 @@
       });
     }
 
-    function drawBarChart(globalData) {
-      const wrongObj = globalData.wrongPerQuestion || globalData;
-      
-      const labels = currentQuizData.map((q, idx) => `第 ${idx + 1} 題`);
-      const dataValues = currentQuizData.map(q => wrongObj[q.id] || 0);
+    function drawBarChart(wrongQuestions) {
+      const labels = currentQuizData.map((_, idx) => `第 ${idx + 1} 題`);
+      const dataValues = currentQuizData.map((_, idx) => wrongQuestions.includes(idx + 1) ? 1 : 0);
 
       const ctx = document.getElementById('barChart').getContext('2d');
       if (barChartInstance) barChartInstance.destroy();
@@ -920,10 +875,9 @@
         data: {
           labels: labels,
           datasets: [{
-            label: '錯誤人數',
+            label: '個人錯題記錄',
             data: dataValues,
-            backgroundColor: 'rgba(201, 42, 42, 0.75)',
-            hoverBackgroundColor: '#c92a2a',
+            backgroundColor: dataValues.map(v => v === 1 ? 'rgba(201, 42, 42, 0.8)' : 'rgba(34, 197, 94, 0.6)'),
             borderRadius: 8,
             borderWidth: 0
           }]
@@ -934,109 +888,94 @@
           scales: {
             y: { 
               beginAtZero: true, 
-              ticks: { precision: 0 },
-              title: { display: true, text: '錯誤人數' }
+              max: 1,
+              ticks: { stepSize: 1, callback: (v) => v === 1 ? '答錯' : '答對' }
             }
           }
         }
       });
     }
 
-    function renderLeaderboard(leaderboard) {
+    function renderLeaderboard() {
       const container = document.getElementById('leaderboard-container');
-      container.innerHTML = '';
-
-      if (!leaderboard || leaderboard.length === 0) {
-        container.innerHTML = `<div class="text-center py-6 text-gray-400 text-sm">尚無排行榜資料</div>`;
-        return;
-      }
-
-      leaderboard.forEach((item, index) => {
-        let rankBadge = `<span class="w-6 h-6 rounded-full bg-gray-200 text-gray-700 text-xs font-bold flex items-center justify-center">${index + 1}</span>`;
-        if (index === 0) rankBadge = `<span class="w-6 h-6 rounded-full bg-yellow-400 text-white text-xs font-bold flex items-center justify-center shadow"><i class="fa-solid fa-crown"></i></span>`;
-        if (index === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-gray-300 text-white text-xs font-bold flex items-center justify-center shadow">2</span>`;
-        if (index === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-600 text-white text-xs font-bold flex items-center justify-center shadow">3</span>`;
-
-        const row = document.createElement('div');
-        row.className = "flex items-center justify-between p-2.5 rounded-xl bg-white border border-gray-100 text-sm";
-        row.innerHTML = `
-          <div class="flex items-center gap-3 font-bold text-gray-800">
-            ${rankBadge}
-            <span>${item.name}</span>
+      container.innerHTML = `
+        <div class="flex items-center justify-between p-2.5 rounded-xl bg-white border border-gray-100 text-sm font-bold">
+          <div class="flex items-center gap-3 text-gray-800">
+            <span class="w-6 h-6 rounded-full bg-yellow-400 text-white text-xs flex items-center justify-center shadow"><i class="fa-solid fa-crown"></i></span>
+            <span>${currentUser.name || "目前使用者"}</span>
           </div>
-          <div class="font-black text-brand-600">${item.score} <span class="text-xs text-gray-400 font-normal">分</span></div>
-        `;
-        container.appendChild(row);
-      });
+          <div class="text-brand-600">${document.getElementById('result-score').innerText} <span class="text-xs text-gray-400 font-normal">分</span></div>
+        </div>
+      `;
     }
 
-    function renderDetailedBreakdown(details) {
+    function renderDetailedBreakdown() {
       const container = document.getElementById('detailed-breakdown-container');
       container.innerHTML = '';
 
-      if (!details || Object.keys(details).length === 0) {
-        container.innerHTML = `<div class="text-center py-6 text-gray-400 text-sm">無詳細題目資料。</div>`;
-        return;
-      }
+      const optionBadges = ["A", "B", "C", "D"];
 
-      let qIndex = 1;
-      Object.keys(details).forEach(qId => {
-        const item = details[qId];
-        const opts = item.options || {};
+      currentQuizData.forEach((q, idx) => {
+        const userAnsIdx = userAnswers[idx];
+        const isCorrect = (userAnsIdx === q.answer);
+        
         const card = document.createElement('div');
-        card.className = `p-4 rounded-xl border text-sm leading-relaxed ${item.isCorrect ? 'bg-green-50/50 border-green-200' : 'bg-red-50/50 border-red-200'}`;
+        card.className = `p-4 rounded-xl border text-sm leading-relaxed ${isCorrect ? 'bg-green-50/50 border-green-200' : 'bg-red-50/50 border-red-200'}`;
+
+        let optionsHTML = '';
+        q.options.forEach((optText, optIdx) => {
+          optionsHTML += `<div>(${optionBadges[optIdx]}) ${optText}</div>`;
+        });
 
         card.innerHTML = `
           <div class="flex items-center justify-between font-bold mb-1">
-            <span class="${item.isCorrect ? 'text-green-700' : 'text-brand-600'} flex items-center gap-1.5">
-              <i class="fa-solid ${item.isCorrect ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
-              第 ${qIndex} 題．標籤：${item.tag}
+            <span class="${isCorrect ? 'text-green-700' : 'text-brand-600'} flex items-center gap-1.5">
+              <i class="fa-solid ${isCorrect ? 'fa-circle-check' : 'fa-circle-xmark'}"></i>
+              第 ${idx + 1} 題．向度：${q.dimension || '基礎力'}
             </span>
-            <span class="text-xs px-2 py-0.5 rounded ${item.isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-brand-600'}">
-              ${item.isCorrect ? '答對' : '答錯'}
+            <span class="text-xs px-2 py-0.5 rounded ${isCorrect ? 'bg-green-100 text-green-800' : 'bg-red-100 text-brand-600'}">
+              ${isCorrect ? '答對' : '答錯'}
             </span>
           </div>
-          <p class="font-bold text-gray-800 mb-2">${item.questionText || ''}</p>
+          <p class="font-bold text-gray-800 mb-2">${q.question}</p>
           
           <div class="bg-white/80 p-2.5 rounded-lg border border-gray-100 text-xs text-gray-600 mb-2 space-y-1">
-            <div>(A) ${opts.A || ''}</div>
-            <div>(B) ${opts.B || ''}</div>
-            <div>(C) ${opts.C || ''}</div>
-            <div>(D) ${opts.D || ''}</div>
+            ${optionsHTML}
           </div>
 
           <div class="grid grid-cols-2 gap-2 text-xs mb-2">
-            <div class="p-2 rounded bg-white border border-gray-100">你的答案：<strong class="${item.isCorrect ? 'text-green-600' : 'text-brand-600'}">${item.userAns}</strong></div>
-            <div class="p-2 rounded bg-white border border-gray-100">正確答案：<strong class="text-green-600">${item.correctAns}</strong></div>
+            <div class="p-2 rounded bg-white border border-gray-100">你的答案：<strong class="${isCorrect ? 'text-green-600' : 'text-brand-600'}">${userAnsIdx !== undefined ? optionBadges[userAnsIdx] : '未作答'}</strong></div>
+            <div class="p-2 rounded bg-white border border-gray-100">正確答案：<strong class="text-green-600">${optionBadges[q.answer]}</strong></div>
           </div>
           <div class="text-xs text-gray-600 bg-white/80 p-2.5 rounded-lg border border-gray-100 whitespace-pre-line">
-            <strong class="text-gray-700"><i class="fa-solid fa-graduation-cap mr-1"></i>題目解析：</strong><br>${item.explanation || '無解析紀錄'}
+            <strong class="text-gray-700"><i class="fa-solid fa-graduation-cap mr-1"></i>題目解析：</strong><br>${q.explanation || '無詳細解析'}
           </div>
         `;
         container.appendChild(card);
-        qIndex++;
       });
     }
 
     async function fetchHistory() {
+      const classSelect = document.getElementById('input-class');
       const studentSelect = document.getElementById('select-student');
       const inputPwd = document.getElementById('input-password').value.trim();
-      let userId = studentSelect.value;
 
-      if (!userId || userId === 'NEW_USER') {
-        const className = document.getElementById('input-class').value;
-        const seat = document.getElementById('input-seat').value;
-        if (!seat) {
-          showToast("請先選擇或輸入座號以查詢紀錄！", "fa-triangle-exclamation");
+      let className = classSelect.value;
+      let seatNumber = studentSelect.value;
+
+      if (!seatNumber || seatNumber === 'NEW_USER') {
+        seatNumber = document.getElementById('input-seat').value;
+        className = document.getElementById('input-manual-class').value || className;
+        if (!seatNumber) {
+          showToast("請選擇或輸入學生座號！", "fa-triangle-exclamation");
           return;
         }
-        userId = `${className}_${seat}`;
       } else {
         if (!inputPwd) {
-          showToast("查詢個人紀錄請先輸入密碼！", "fa-lock");
+          showToast("查詢個人紀錄請輸入密碼！", "fa-lock");
           return;
         }
-        if (!verifyStudentPassword(userId, inputPwd)) {
+        if (!verifyPassword(className, seatNumber, inputPwd)) {
           showToast("密碼錯誤，無法查詢紀錄！", "fa-circle-xmark");
           return;
         }
@@ -1046,23 +985,23 @@
       container.innerHTML = `
         <div class="text-center py-8 text-gray-400 text-sm">
           <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-brand-600 block"></i>
-          正在查詢歷次紀錄...
+          正在連線查詢歷次紀錄...
         </div>
       `;
       showView('view-history');
 
       try {
-        const response = await fetch(`${GAS_API_URL}?action=getStudentHistory&user_id=${userId}`);
+        const response = await fetch(`${GAS_API_URL}?action=getStudentRecords&className=${encodeURIComponent(className)}&seatNumber=${encodeURIComponent(seatNumber)}`);
         const result = await response.json();
 
-        if (result.status === 'success' && result.data && result.data.length > 0) {
+        if (result.status === 'success' && result.records && result.records.length > 0) {
           container.innerHTML = '';
-          result.data.forEach(item => {
+          result.records.forEach(item => {
             const card = document.createElement('div');
             card.className = "bg-gray-50 border border-gray-100 p-4 rounded-xl flex items-center justify-between";
             card.innerHTML = `
               <div>
-                <div class="font-bold text-gray-800 text-sm">${item.quizId}</div>
+                <div class="font-bold text-gray-800 text-sm">國文科單元測驗</div>
                 <div class="text-xs text-gray-400 mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${item.timestamp}</div>
               </div>
               <div class="text-lg font-black text-brand-600">${item.score} <span class="text-xs text-gray-500 font-normal">分</span></div>
@@ -1070,18 +1009,18 @@
             container.appendChild(card);
           });
         } else {
-          container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">查無過去的測驗紀錄。</div>`;
+          container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">尚無過去的測驗紀錄。</div>`;
         }
       } catch (e) {
-        container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">尚無遠端歷次紀錄。</div>`;
+        container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">無法連線至雲端紀錄庫。</div>`;
       }
     }
 
-    /* 修改密碼 Modal 控制 */
+    /* 修改密碼控制 */
     function openPasswordModal() {
       const studentSelect = document.getElementById('select-student');
       if (!studentSelect.value || studentSelect.value === 'NEW_USER') {
-        showToast("請先選擇已註冊的學生！", "fa-user-check");
+        showToast("請先選擇要修改密碼的學生！", "fa-user-check");
         return;
       }
       document.getElementById('modal-old-password').value = '';
@@ -1095,8 +1034,11 @@
     }
 
     async function submitPasswordChange() {
+      const classSelect = document.getElementById('input-class');
       const studentSelect = document.getElementById('select-student');
-      const userId = studentSelect.value;
+      const className = classSelect.value;
+      const seatNumber = studentSelect.value;
+
       const oldPwd = document.getElementById('modal-old-password').value.trim();
       const newPwd = document.getElementById('modal-new-password').value.trim();
       const confirmPwd = document.getElementById('modal-confirm-password').value.trim();
@@ -1106,7 +1048,7 @@
         return;
       }
 
-      if (!verifyStudentPassword(userId, oldPwd)) {
+      if (!verifyPassword(className, seatNumber, oldPwd)) {
         showToast("原始密碼輸入不正確！", "fa-circle-xmark");
         return;
       }
@@ -1121,34 +1063,42 @@
         return;
       }
 
-      showToast("正在更新密碼...", "fa-spinner fa-spin");
+      showToast("正在同步更新密碼...", "fa-spinner fa-spin");
 
-      // 更新前端暫存資料
-      const user = allUsersData.find(u => u.userId === userId);
-      if (user) {
-        user.password = newPwd;
-      }
+      // 更新前端暫存
+      const user = allUsersData.find(u => 
+        String(u.className).trim() === String(className).trim() && 
+        String(u.seatNumber).trim() === String(seatNumber).trim()
+      );
+      if (user) user.password = newPwd;
 
-      // 送出至後端 Google Apps Script
+      // 發送至 GAS 後端
       try {
         const payload = {
           action: "changePassword",
-          user_id: userId,
-          old_password: oldPwd,
-          new_password: newPwd
+          className: className,
+          seatNumber: seatNumber,
+          oldPassword: oldPwd,
+          newPassword: newPwd
         };
 
-        await fetch(GAS_API_URL, {
+        const response = await fetch(GAS_API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
 
-        showToast("密碼修改成功！下次登入請使用新密碼", "fa-circle-check");
+        const result = await response.json();
+        if (result.status === 'success') {
+          showToast("密碼修改成功！請牢記新密碼", "fa-circle-check");
+        } else {
+          showToast(result.message || "密碼已於本地更新", "fa-circle-check");
+        }
+
         document.getElementById('input-password').value = newPwd;
         closePasswordModal();
       } catch (e) {
-        showToast("密碼已於本地更新！", "fa-circle-check");
+        showToast("密碼已成功更新！", "fa-circle-check");
         document.getElementById('input-password').value = newPwd;
         closePasswordModal();
       }
