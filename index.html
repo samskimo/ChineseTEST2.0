@@ -166,11 +166,15 @@
               <input type="text" id="input-name" placeholder="輸入姓名" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand-600">
             </div>
           </div>
+          <div>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Email（接收診斷報告）</label>
+            <input type="email" id="input-manual-email" placeholder="student@example.com" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand-600">
+          </div>
         </div>
 
         <div id="registered-student-notice" class="bg-blue-50/80 border border-blue-200 rounded-2xl p-3 text-xs text-blue-800 flex items-center gap-2">
           <i class="fa-solid fa-shield-cat text-blue-600 text-lg flex-shrink-0"></i>
-          <span>預設密碼為 <strong>1234</strong>，首次登入建議點擊右上方「修改密碼」更新個人密碼。</span>
+          <span>預設密碼為 <strong>1234</strong>，測驗完畢後診斷報告將自動寄至試算表登錄之 Email。</span>
         </div>
 
         <button onclick="startQuiz()" class="w-full py-3.5 bg-brand-600 hover:bg-brand-700 active:scale-[0.99] text-white font-bold rounded-xl shadow-lg shadow-red-200 transition flex items-center justify-center gap-2 text-base mt-2">
@@ -215,7 +219,7 @@
 
         <div id="question-wrapper" class="md:col-span-12 space-y-4 flex flex-col justify-between">
           <div>
-            <h2 id="question-title" class="text-base sm:text-lg font-bold text-gray-800 leading-snug mb-4">
+            <h2 id="question-title" class="text-base sm:lg font-bold text-gray-800 leading-snug mb-4">
               題目載入中...
             </h2>
             <div id="options-list" class="space-y-3"></div>
@@ -279,18 +283,18 @@
         </div>
       </div>
 
-      <!-- 2. 錯題統計頁籤 (個人錯題 vs 群體錯誤累積人數) -->
+      <!-- 2. 錯題統計頁籤 -->
       <div id="tab-content-2" class="tab-content space-y-4">
         <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 sm:p-6">
           <div class="text-xs font-bold text-gray-500 mb-1 text-center">個人作答狀態 vs 全體錯題分佈</div>
-          <div class="text-[11px] text-gray-400 text-center mb-3">長條高度代表「全班答錯人數」，紅色標籤標示「你答錯的題號」</div>
+          <div class="text-[11px] text-gray-400 text-center mb-3">長條高度代表「全班答錯人數」，紅色柱體標示「你答錯的題號」</div>
           <div class="w-full max-w-md mx-auto mb-2">
             <canvas id="barChart"></canvas>
           </div>
         </div>
       </div>
 
-      <!-- 3. 個人成就頁籤 (個人表現 vs 全班 Top 10) -->
+      <!-- 3. 個人成就頁籤 -->
       <div id="tab-content-3" class="tab-content space-y-4">
         <div class="bg-gray-50 border border-gray-100 rounded-2xl p-4 sm:p-6">
           <div class="text-xs font-bold text-gray-500 mb-3 text-center flex items-center justify-center gap-1">
@@ -318,7 +322,7 @@
       </div>
     </section>
 
-    <!-- 4. 學習歷程視圖 (呈現錯題向度標籤) -->
+    <!-- 4. 學習歷程視圖 -->
     <section id="view-history" class="view-section p-6 sm:p-10">
       <div class="flex items-center justify-between mb-6 pb-3 border-b border-gray-100">
         <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -394,8 +398,8 @@
   </div>
 
   <script>
-    // 您最新部署的 Google Apps Script Web App API URL
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbzeMLq46VaxRIb5ZiKuV3kt1g8eZUwLM7K_aQo5KXpKcYLJCU-EhkPswOY7Qf_GJ8f8/exec";
+    // 您最新發布的 Google Apps Script Web App API URL
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbz9bZRCDFjwH9NQNrZZE8Gpoih5YslqDNHzHyff5cyJo8OyWbAT_58N1zaygTpDvduR/exec";
 
     let allUsersData = [];
     let currentQuizData = [];
@@ -487,7 +491,7 @@
         filteredUsers.sort((a, b) => Number(a.seatNumber) - Number(b.seatNumber));
         filteredUsers.forEach(u => {
           const paddedSeat = String(u.seatNumber).padStart(2, '0');
-          studentSelect.innerHTML += `<option value="${u.seatNumber}" data-name="${u.name}" data-class="${u.className}" data-pwd="${u.password || '1234'}">${paddedSeat}號 ${u.name}</option>`;
+          studentSelect.innerHTML += `<option value="${u.seatNumber}" data-name="${u.name}" data-class="${u.className}" data-email="${u.email || ''}" data-pwd="${u.password || '1234'}">${paddedSeat}號 ${u.name}</option>`;
         });
       }
       studentSelect.innerHTML += `<option value="NEW_USER">➕ 找不到名字？（臨時新增）</option>`;
@@ -511,7 +515,7 @@
     function verifyPassword(className, seatNumber, inputPwd) {
       const user = allUsersData.find(u => 
         String(u.className).trim() === String(className).trim() && 
-        String(u.seatNumber).trim() === String(seatNumber).trim()
+        Number(u.seatNumber) === Number(seatNumber)
       );
       const expected = user ? (user.password || '1234') : '1234';
       return String(inputPwd).trim() === String(expected).trim();
@@ -526,11 +530,13 @@
       let className = classSelect.value;
       let seatNumber = "";
       let name = "";
+      let email = "";
 
       if (studentSelect.value === 'NEW_USER' || !studentSelect.value) {
         seatNumber = document.getElementById('input-seat').value.trim();
         className = document.getElementById('input-manual-class').value.trim() || className;
         name = document.getElementById('input-name').value.trim();
+        email = document.getElementById('input-manual-email').value.trim();
 
         if (!seatNumber || !name) {
           showToast("請填寫臨時學生的座號與姓名！", "fa-triangle-exclamation");
@@ -546,15 +552,17 @@
               className: className,
               seatNumber: seatNumber,
               name: name,
+              email: email,
               password: "1234"
             })
           });
         } catch(e) {}
-        allUsersData.push({ className, seatNumber, name, password: "1234" });
+        allUsersData.push({ className, seatNumber, name, email, password: "1234" });
       } else {
         const selectedOpt = studentSelect.options[studentSelect.selectedIndex];
         seatNumber = studentSelect.value;
         name = selectedOpt.getAttribute('data-name');
+        email = selectedOpt.getAttribute('data-email') || '';
 
         if (!inputPwd) {
           showToast("請輸入登入密碼！", "fa-lock");
@@ -567,7 +575,7 @@
         }
       }
 
-      currentUser = { className, seatNumber, name, quizId };
+      currentUser = { className, seatNumber, name, email, quizId };
 
       if (!currentQuizData || currentQuizData.length === 0) {
         showToast("載入試卷中...", "fa-spinner fa-spin");
@@ -680,7 +688,7 @@
     }
 
     async function submitQuiz() {
-      showToast("批改分析與統計中，請稍候...", "fa-spinner fa-spin");
+      showToast("批改分析與寄送報告中...", "fa-spinner fa-spin");
 
       let correctCount = 0;
       let dimensionStats = {};
@@ -718,6 +726,7 @@
         className: currentUser.className,
         seatNumber: currentUser.seatNumber,
         name: currentUser.name,
+        email: currentUser.email || "",
         score: score,
         correctCount: correctCount,
         wrongQuestions: wrongQuestions,
@@ -727,11 +736,15 @@
 
       let statsData = null;
       try {
-        await fetch(GAS_API_URL, {
+        const submitRes = await fetch(GAS_API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(payload)
         });
+        const submitJson = await submitRes.json();
+        if (submitJson.emailStatus && submitJson.emailStatus.includes('寄送成功')) {
+          showToast("作答已送出，診斷報告已寄至信箱！", "fa-envelope-circle-check");
+        }
 
         const statsRes = await fetch(`${GAS_API_URL}?action=getQuizStats&quizId=${encodeURIComponent(currentUser.quizId)}`);
         statsData = await statsRes.json();
@@ -1093,7 +1106,7 @@
 
       const user = allUsersData.find(u => 
         String(u.className).trim() === String(className).trim() && 
-        String(u.seatNumber).trim() === String(seatNumber).trim()
+        Number(u.seatNumber) === Number(seatNumber)
       );
       if (user) user.password = newPwd;
 
