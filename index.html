@@ -84,7 +84,7 @@
 
   <main class="w-full max-w-4xl bg-white rounded-3xl card-shadow border border-red-50/60 overflow-hidden relative my-auto">
     
-    <!-- 1. 登入與身分選擇視圖 -->
+    <!-- 1. 登入視圖 -->
     <section id="view-login" class="view-section active p-6 sm:p-10 max-w-3xl mx-auto">
       <div class="text-center mb-6">
         <div class="w-16 h-16 bg-red-50 border-2 border-brand-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
@@ -131,14 +131,21 @@
           </div>
         </div>
 
+        <!-- 密碼與功能按鈕 -->
         <div id="password-field-wrapper" class="space-y-1">
           <div class="flex items-center justify-between">
             <label class="block text-xs font-bold text-gray-600">
               <i class="fa-solid fa-key text-brand-600 mr-1"></i>登入密碼
             </label>
-            <button type="button" onclick="openPasswordModal()" class="text-xs text-brand-600 hover:text-brand-700 font-bold hover:underline transition">
-              <i class="fa-solid fa-pen-to-square mr-1"></i>修改密碼？
-            </button>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="openForgotPasswordModal()" class="text-xs text-gray-500 hover:text-brand-600 font-bold hover:underline transition">
+                忘記密碼？
+              </button>
+              <span class="text-gray-300">|</span>
+              <button type="button" onclick="openPasswordModal()" class="text-xs text-brand-600 hover:text-brand-700 font-bold hover:underline transition">
+                修改密碼
+              </button>
+            </div>
           </div>
           <input type="password" id="input-password" placeholder="請輸入密碼 (預設: 1234)" class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm font-medium transition">
         </div>
@@ -163,7 +170,7 @@
             </div>
           </div>
           <div>
-            <label class="block text-[11px] font-bold text-gray-500 mb-1">Email（接收診斷報告）</label>
+            <label class="block text-[11px] font-bold text-gray-500 mb-1">Email（接收診斷報告與重設密碼）</label>
             <input type="email" id="input-manual-email" placeholder="student@example.com" class="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:border-brand-600">
           </div>
         </div>
@@ -189,7 +196,7 @@
       </div>
     </section>
 
-    <!-- 2. 教師專屬：全體診斷與錯題穿透儀表板 (新增) -->
+    <!-- 2. 教師專屬儀表板 -->
     <section id="view-teacher" class="view-section p-6 sm:p-8">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-6 border-b border-gray-100 gap-3">
         <div>
@@ -205,12 +212,10 @@
         </button>
       </div>
 
-      <!-- 儀表板篩選器 -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 bg-red-50/40 p-4 rounded-2xl border border-red-100">
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1">切換測驗單元</label>
-          <select id="teacher-select-quiz" onchange="loadTeacherAnalytics()" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white font-medium text-sm focus:outline-none focus:ring-2 focus:ring-brand-600">
-          </select>
+          <select id="teacher-select-quiz" onchange="loadTeacherAnalytics()" class="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white font-medium text-sm focus:outline-none focus:ring-2 focus:ring-brand-600"></select>
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-600 mb-1">篩選班級</label>
@@ -220,7 +225,6 @@
         </div>
       </div>
 
-      <!-- 核心概況卡片 -->
       <div class="grid grid-cols-3 gap-3 mb-6">
         <div class="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-center">
           <div class="text-xs text-gray-400 font-bold mb-1">已繳交人數</div>
@@ -236,25 +240,22 @@
         </div>
       </div>
 
-      <!-- 全體錯題人數圖表 -->
       <div class="bg-gray-50 border border-gray-100 p-4 sm:p-6 rounded-2xl mb-6">
         <div class="text-xs font-bold text-gray-600 mb-2 flex items-center justify-between">
           <span>全體各題答錯人數分佈長條圖</span>
-          <span class="text-[11px] text-gray-400 font-normal">點擊下方題號卡片可直接查看「答錯名單」</span>
+          <span class="text-[11px] text-gray-400 font-normal">可查看下方題號卡片「答錯名單」</span>
         </div>
         <div class="w-full max-h-[220px]">
           <canvas id="teacherBarChart"></canvas>
         </div>
       </div>
 
-      <!-- 逐題深度穿透卡片列表 -->
       <div class="space-y-3 mb-4">
         <div class="text-xs font-bold text-gray-600 flex items-center gap-1.5">
           <i class="fa-solid fa-list-check text-brand-600"></i>
           <span>各題題目、解析與答錯學生名單</span>
         </div>
-        <div id="teacher-questions-container" class="space-y-4 max-h-[450px] overflow-y-auto pr-1">
-        </div>
+        <div id="teacher-questions-container" class="space-y-4 max-h-[450px] overflow-y-auto pr-1"></div>
       </div>
     </section>
 
@@ -404,38 +405,57 @@
 
   </main>
 
-  <!-- 歷程紀錄錯題詳解彈窗 -->
-  <div id="history-breakdown-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl border border-red-100">
-      <div class="p-4 sm:p-5 bg-brand-600 text-white flex items-center justify-between font-bold text-sm">
+  <!-- 忘記密碼 (Email 驗證重設) 彈窗 -->
+  <div id="forgot-password-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-red-100">
+      <div class="p-5 bg-brand-600 text-white flex items-center justify-between font-bold">
         <div class="flex items-center gap-2">
-          <i class="fa-solid fa-file-circle-check text-lg"></i>
-          <span id="history-modal-title">測驗錯題回顧與解析</span>
+          <i class="fa-solid fa-unlock-keyhole"></i>
+          <span>忘記密碼重設</span>
         </div>
-        <button onclick="closeHistoryModal()" class="text-white hover:text-red-200 text-xl font-black">&times;</button>
+        <button onclick="closeForgotPasswordModal()" class="text-white hover:text-red-200 text-xl font-bold">&times;</button>
       </div>
-      <div id="history-modal-content" class="p-4 sm:p-6 overflow-y-auto space-y-4"></div>
-      <div class="p-3 bg-gray-50 border-t border-gray-100 text-right">
-        <button onclick="closeHistoryModal()" class="px-5 py-2 bg-brand-600 text-white font-bold text-xs rounded-xl shadow-md">關閉視窗</button>
+      
+      <!-- 步驟 1：輸入註冊 Email 發送驗證碼 -->
+      <div id="forgot-step-1" class="p-6 space-y-4">
+        <p class="text-xs text-gray-500">請輸入您在系統登記的電子信箱，我們將寄送 6 位數安全驗證碼給您。</p>
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">登記之 Email</label>
+          <input type="email" id="modal-forgot-email" placeholder="student@example.com" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
+        </div>
+        <div class="pt-2 flex gap-2">
+          <button onclick="closeForgotPasswordModal()" class="w-1/2 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition">取消</button>
+          <button onclick="sendForgotResetCode()" class="w-1/2 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-sm shadow-md transition">發送驗證碼</button>
+        </div>
+      </div>
+
+      <!-- 步驟 2：輸入驗證碼並設定新密碼 -->
+      <div id="forgot-step-2" class="p-6 space-y-4 hidden">
+        <div class="bg-green-50 text-green-700 border border-green-200 p-2.5 rounded-xl text-xs flex items-center gap-2">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>驗證碼已寄出，請至信箱收取並於 10 分鐘內完成設定。</span>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">6 位數驗證碼</label>
+          <input type="text" id="modal-forgot-code" placeholder="請輸入 6 位驗證碼" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm font-mono tracking-widest text-center text-lg">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">設定新密碼</label>
+          <input type="password" id="modal-forgot-newpwd" placeholder="請輸入新密碼" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-600 mb-1">確認新密碼</label>
+          <input type="password" id="modal-forgot-confirmpwd" placeholder="再次輸入新密碼" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-600 focus:outline-none text-sm">
+        </div>
+        <div class="pt-2 flex gap-2">
+          <button onclick="backToForgotStep1()" class="w-1/3 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl text-sm transition">上一步</button>
+          <button onclick="submitForgotResetPassword()" class="w-2/3 py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-sm shadow-md transition">確認重設密碼</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- 行動端閱讀原文彈窗 -->
-  <div id="mobile-passage-modal" class="fixed inset-0 bg-black/50 z-40 hidden flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
-      <div class="p-4 bg-brand-600 text-white flex items-center justify-between font-bold text-sm">
-        <span><i class="fa-solid fa-book-open mr-2"></i>文章原文</span>
-        <button onclick="closePassageModal()" class="text-white hover:text-red-200 text-lg px-2">&times;</button>
-      </div>
-      <div id="mobile-passage-text" class="p-5 overflow-y-auto font-serif text-sm leading-relaxed text-gray-700 whitespace-pre-line"></div>
-      <div class="p-3 bg-gray-50 border-t border-gray-100 text-right">
-        <button onclick="closePassageModal()" class="px-4 py-2 bg-brand-600 text-white font-bold text-xs rounded-lg">關閉</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 修改密碼彈窗 -->
+  <!-- 一般修改密碼彈窗 -->
   <div id="change-password-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-white rounded-3xl w-full max-w-md overflow-hidden shadow-2xl border border-red-100">
       <div class="p-5 bg-brand-600 text-white flex items-center justify-between font-bold">
@@ -467,6 +487,37 @@
     </div>
   </div>
 
+  <!-- 歷程紀錄錯題詳解彈窗 -->
+  <div id="history-breakdown-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden shadow-2xl border border-red-100">
+      <div class="p-4 sm:p-5 bg-brand-600 text-white flex items-center justify-between font-bold text-sm">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-file-circle-check text-lg"></i>
+          <span id="history-modal-title">測驗錯題回顧與解析</span>
+        </div>
+        <button onclick="closeHistoryModal()" class="text-white hover:text-red-200 text-xl font-black">&times;</button>
+      </div>
+      <div id="history-modal-content" class="p-4 sm:p-6 overflow-y-auto space-y-4"></div>
+      <div class="p-3 bg-gray-50 border-t border-gray-100 text-right">
+        <button onclick="closeHistoryModal()" class="px-5 py-2 bg-brand-600 text-white font-bold text-xs rounded-xl shadow-md">關閉視窗</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 行動端閱讀原文彈窗 -->
+  <div id="mobile-passage-modal" class="fixed inset-0 bg-black/50 z-40 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="p-4 bg-brand-600 text-white flex items-center justify-between font-bold text-sm">
+        <span><i class="fa-solid fa-book-open mr-2"></i>文章原文</span>
+        <button onclick="closePassageModal()" class="text-white hover:text-red-200 text-lg px-2">&times;</button>
+      </div>
+      <div id="mobile-passage-text" class="p-5 overflow-y-auto font-serif text-sm leading-relaxed text-gray-700 whitespace-pre-line"></div>
+      <div class="p-3 bg-gray-50 border-t border-gray-100 text-right">
+        <button onclick="closePassageModal()" class="px-4 py-2 bg-brand-600 text-white font-bold text-xs rounded-lg">關閉</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast 通知 -->
   <div id="custom-toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 transform -translate-y-12 opacity-0 transition-all duration-300 pointer-events-none">
     <div id="toast-body" class="bg-gray-900/90 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-xl text-sm font-medium flex items-center gap-2">
@@ -476,8 +527,7 @@
   </div>
 
   <script>
-    // 請替換為您重新發布的 GAS Web App API URL
-    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbwIuGSp3hL04rQ6kmZJa9uOT8wj_BalT1GxQNKXpCwtgWWk-BpndKPQanSyVS5UIw82/exec";
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxiIGkHJJpgTowCABYKX7Wtng9CBSUIIL_TkfIuBjqp9CvO8F4j5PSWJntLASiE9Wpq/exec";
 
     let allUsersData = [];
     let currentQuizData = [];
@@ -516,7 +566,6 @@
           statusTag.innerText = "連線異常";
         }
       } catch (e) {
-        console.warn("GAS 遠端連線問題：", e);
         statusTag.innerText = "離線模式";
       }
     }
@@ -542,9 +591,7 @@
           currentQuizData = result.questions;
           showToast(`已載入【${selectedUnit}】共 ${currentQuizData.length} 題`, "fa-circle-check");
         }
-      } catch (e) {
-        console.warn("無法取得該單元題目", e);
-      }
+      } catch (e) {}
     }
 
     function initClassOptions() {
@@ -602,7 +649,6 @@
       }
     }
 
-    // 登入驗證（教師 vs 學生分流）
     async function startLogin() {
       const classSelect = document.getElementById('input-class');
       const studentSelect = document.getElementById('select-student');
@@ -668,7 +714,6 @@
             return;
           }
 
-          // 若為教師角色，進入教師儀表板
           if (authJson.role === 'teacher') {
             currentUser = { className, seatNumber, name, role: 'teacher' };
             initTeacherDashboard();
@@ -682,7 +727,6 @@
         }
       }
 
-      // 學生流程：開始測驗
       currentUser = { className, seatNumber, name, email, quizId, role: 'student' };
 
       if (!currentQuizData || currentQuizData.length === 0) {
@@ -708,18 +752,129 @@
       showView('view-quiz');
     }
 
+    /* ====== 忘記密碼處理函式 ====== */
+    function openForgotPasswordModal() {
+      const studentSelect = document.getElementById('select-student');
+      if (!studentSelect.value || studentSelect.value === 'NEW_USER') {
+        showToast("請先在畫面上選擇您的班級與姓名！", "fa-user-check");
+        return;
+      }
+      document.getElementById('modal-forgot-email').value = '';
+      document.getElementById('modal-forgot-code').value = '';
+      document.getElementById('modal-forgot-newpwd').value = '';
+      document.getElementById('modal-forgot-confirmpwd').value = '';
+      
+      document.getElementById('forgot-step-1').classList.remove('hidden');
+      document.getElementById('forgot-step-2').classList.add('hidden');
+      document.getElementById('forgot-password-modal').classList.remove('hidden');
+    }
+
+    function closeForgotPasswordModal() {
+      document.getElementById('forgot-password-modal').classList.add('hidden');
+    }
+
+    function backToForgotStep1() {
+      document.getElementById('forgot-step-1').classList.remove('hidden');
+      document.getElementById('forgot-step-2').classList.add('hidden');
+    }
+
+    async function sendForgotResetCode() {
+      const classSelect = document.getElementById('input-class');
+      const studentSelect = document.getElementById('select-student');
+      const email = document.getElementById('modal-forgot-email').value.trim();
+
+      if (!email) {
+        showToast("請輸入註冊時填寫的 Email！", "fa-triangle-exclamation");
+        return;
+      }
+
+      showToast("正在驗證帳號並寄送驗證碼...", "fa-spinner fa-spin");
+
+      try {
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: "sendResetCode",
+            className: classSelect.value,
+            seatNumber: studentSelect.value,
+            email: email
+          })
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+          showToast(result.message, "fa-envelope-circle-check");
+          document.getElementById('forgot-step-1').classList.add('hidden');
+          document.getElementById('forgot-step-2').classList.remove('hidden');
+        } else {
+          showToast(result.message || "發送失敗", "fa-circle-xmark");
+        }
+      } catch(e) {
+        showToast("連線異常，請稍後再試！", "fa-circle-exclamation");
+      }
+    }
+
+    async function submitForgotResetPassword() {
+      const classSelect = document.getElementById('input-class');
+      const studentSelect = document.getElementById('select-student');
+      const code = document.getElementById('modal-forgot-code').value.trim();
+      const newPwd = document.getElementById('modal-forgot-newpwd').value.trim();
+      const confirmPwd = document.getElementById('modal-forgot-confirmpwd').value.trim();
+
+      if (!code || !newPwd || !confirmPwd) {
+        showToast("請完整填寫驗證碼與新密碼！", "fa-triangle-exclamation");
+        return;
+      }
+
+      if (newPwd !== confirmPwd) {
+        showToast("兩次輸入的新密碼不吻合！", "fa-triangle-exclamation");
+        return;
+      }
+
+      if (newPwd.length < 3) {
+        showToast("密碼長度至少需 3 碼以上！", "fa-triangle-exclamation");
+        return;
+      }
+
+      showToast("正在驗證並重設密碼...", "fa-spinner fa-spin");
+
+      try {
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: "resetPasswordWithCode",
+            className: classSelect.value,
+            seatNumber: studentSelect.value,
+            code: code,
+            newPassword: newPwd
+          })
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+          showToast("密碼重設成功！已為您自動填入新密碼", "fa-circle-check");
+          document.getElementById('input-password').value = newPwd;
+          closeForgotPasswordModal();
+        } else {
+          showToast(result.message || "驗證失敗", "fa-circle-xmark");
+        }
+      } catch(e) {
+        showToast("連線異常，請稍後再試！", "fa-circle-exclamation");
+      }
+    }
+
     /* ====== 教師管理儀表板邏輯 ====== */
     function initTeacherDashboard() {
       document.getElementById('teacher-welcome-title').innerText = `${currentUser.name} 的教學診斷後台`;
 
-      // 填入單元選單
       const tQuizSelect = document.getElementById('teacher-select-quiz');
       tQuizSelect.innerHTML = '';
       availableUnits.forEach(u => {
         tQuizSelect.innerHTML += `<option value="${u}">${u}</option>`;
       });
 
-      // 填入班級選單
       const tClassSelect = document.getElementById('teacher-select-class');
       tClassSelect.innerHTML = `<option value="ALL">全部受測班級 (全體統計)</option>`;
       const classes = [...new Set(allUsersData.map(u => String(u.className).trim()).filter(c => c && c !== '教師' && c !== '教師組'))];
@@ -766,7 +921,6 @@
         document.getElementById('stat-high-low').innerText = "- / -";
       }
 
-      // 繪製全體長條圖
       const labels = data.questions.map(q => `第 ${q.qIndex} 題`);
       const wrongCounts = data.questions.map(q => {
         return data.questionAnalysis[q.qIndex] ? data.questionAnalysis[q.qIndex].wrongCount : 0;
@@ -796,7 +950,6 @@
         }
       });
 
-      // 渲染逐題卡片與答錯名單
       const container = document.getElementById('teacher-questions-container');
       container.innerHTML = '';
       const optionBadges = ["A", "B", "C", "D"];
@@ -840,18 +993,12 @@
               錯誤率 ${wrongRate}% (${analysis.wrongCount}人)
             </span>
           </div>
-
           ${passageHTML}
-
-          <div class="bg-gray-50 p-3 rounded-xl border border-gray-100 text-xs space-y-1 mb-3">
-            ${optionsHTML}
-          </div>
-
+          <div class="bg-gray-50 p-3 rounded-xl border border-gray-100 text-xs space-y-1 mb-3">${optionsHTML}</div>
           <div class="bg-red-50/50 p-3 rounded-xl border border-red-100 mb-2">
             <div class="text-xs font-bold text-brand-600 mb-1.5"><i class="fa-solid fa-users-viewfinder mr-1"></i>答錯學生名單與干擾項選擇：</div>
             <div class="flex flex-wrap gap-1.5">${studentsHTML}</div>
           </div>
-
           <div class="text-xs text-gray-500 bg-gray-50 p-2.5 rounded-lg border border-gray-100 whitespace-pre-line">
             <strong>題目解析：</strong><br>${q.explanation || '無詳細解析'}
           </div>
@@ -860,7 +1007,7 @@
       });
     }
 
-    /* ====== 學生作答與雷達圖邏輯 (維持完整) ====== */
+    /* ====== 學生作答核心邏輯 ====== */
     function renderQuestion() {
       const q = currentQuizData[currentQuestionIndex];
       const total = currentQuizData.length;
